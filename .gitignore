@@ -1,0 +1,43 @@
+# Eleventy / Build output
+_site/
+.tmp/
+.cache/
+
+# Node.js / npm
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json          # ← keep if you use npm lockfiles, remove if you prefer yarn/pnpm
+yarn.lock                  # ← keep one of package-lock or yarn.lock, not both
+
+# Editor & OS files
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs & temporary files
+*.log
+*.tmp
+*.bak
+.DS_Store
+
+# Development helpers (optional - uncomment if you don't want to commit them)
+# .eleventy.js.backup
+# netlify.toml
+# vercel.json
+# .env
+# .env.local
+
+# If you ever use image optimization tools or generated assets
+*.cache.jpg
+*.cache.png
+*.cache.webp
+
+# Keep these commented out unless you really need them ignored
+# posts/*.draft.md          # example: ignore draft posts
+# src/assets/uploads/       # if you have a big upload folder you don't commit

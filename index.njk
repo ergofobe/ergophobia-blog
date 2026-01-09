@@ -1,0 +1,128 @@
+---
+title: Ergophobia
+pagination:
+  data: collections.posts
+  size: 6
+  alias: posts
+permalink: "{% if pagination.pageNumber > 0 %}page/{{ pagination.pageNumber + 1 }}/{% endif %}index.html"
+---
+{% extends "layout.njk" %}
+
+{% block content %}
+
+  <section id="posts-list" style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;">
+    {% for post in posts %}
+      <article class="post-card" 
+               id="post-{{ loop.index }}">
+
+        <!-- Excerpt view -->
+        <div class="excerpt-content">
+          <p style="margin: 0 0 1rem 0;">
+            {{ post.templateContent | excerpt | safe }}
+            <button class="read-more" 
+                    data-action="expand" 
+                    title="Expand full post"
+                    style="background: none; border: none; color: var(--accent); font-size: 1.4rem; cursor: pointer; padding: 0 4px; line-height: 1; vertical-align: middle;">
+              …
+            </button>
+          </p>
+        </div>
+
+        <!-- Full content (hidden initially) -->
+        <div class="full-content" style="display: none;">
+          {{ post.templateContent | safe }}
+        </div>
+
+        <!-- Meta row: date + share icon (right-aligned) -->
+        <div class="meta" style="display: flex; justify-content: flex-end; align-items: center; gap: 1rem; font-size: 0.875rem; color: #777; margin-top: 1rem;">
+  	  <time datetime="{{ post.pageEffectiveDate | date('YYYY-MM-DD') }}">
+            {{ post.pageEffectiveDate | date }}
+          </time>
+
+          <button class="share-btn" 
+                  title="Copy link to this post" 
+                  data-url="{{ page.url | absoluteUrl(site.url) }}{{ post.url }}" 
+                  style="background: none; border: none; cursor: pointer; padding: 0; line-height: 1; width: 20px; height: 20px; display: flex; align-items: center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 16.08C17.24 16.08 16.56 16.38 16.04 16.85L8.91 12.7C8.96 12.47 9 12.24 9 12C9 11.76 8.96 11.53 8.91 11.3L15.96 7.19C16.5 7.69 17.21 8 18 8C19.66 8 21 6.66 21 5C21 3.34 19.66 2 18 2C16.34 2 15 3.34 15 5C15 5.24 15.04 5.47 15.09 5.7L8.04 9.81C7.5 9.31 6.79 9 6 9C4.34 9 3 10.34 3 12C3 13.66 4.34 15 6 15C6.79 15 7.5 14.69 8.04 14.19L15.16 18.35C15.11 18.56 15.08 18.78 15.08 19C15.08 20.61 16.39 21.92 18 21.92C19.61 21.92 20.92 20.61 20.92 19C20.92 17.39 19.61 16.08 18 16.08Z" fill="#666"/>
+            </svg>
+          </button>
+        </div>
+      </article>
+    {% endfor %}
+  </section>
+
+  <script>
+    // Expand full post inline
+    document.querySelectorAll('.read-more[data-action="expand"]').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const article = this.closest('.post-card');
+        const excerptDiv = article.querySelector('.excerpt-content');
+        const fullDiv = article.querySelector('.full-content');
+        
+        excerptDiv.style.display = 'none';
+        fullDiv.style.display = 'block';
+        this.remove();
+      });
+    });
+
+    // Per-post copy link
+    document.querySelectorAll('.share-btn').forEach(btn => {
+      btn.addEventListener('click', async function() {
+        const url = this.getAttribute('data-url');
+        try {
+          await navigator.clipboard.writeText(url);
+          this.style.opacity = '0.6';
+          setTimeout(() => { this.style.opacity = '1'; }, 1500);
+        } catch (err) {
+          console.error('Copy failed', err);
+          prompt('Copy failed — copy manually:', url);
+        }
+      });
+    });
+
+    // Infinite scroll (unchanged)
+    let currentPage = 1;
+    let loading = false;
+    let hasMore = true;
+
+    function loadMorePosts() {
+      if (loading || !hasMore) return;
+      loading = true;
+      currentPage++;
+      const nextUrl = `/page/${currentPage}/`;
+      fetch(nextUrl)
+        .then(response => {
+          if (!response.ok) {
+            if (response.status === 404) hasMore = false;
+            throw new Error('Network response not ok');
+          }
+          return response.text();
+        })
+        .then(html => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const newPosts = doc.querySelector('#posts-list')?.innerHTML;
+          if (newPosts && newPosts.trim()) {
+            document.querySelector('#posts-list').insertAdjacentHTML('beforeend', newPosts);
+          } else {
+            hasMore = false;
+          }
+          loading = false;
+        })
+        .catch(error => {
+          console.error('Error loading posts:', error);
+          loading = false;
+        });
+    }
+
+    window.addEventListener('scroll', () => {
+      const scrollPosition = window.innerHeight + window.scrollY;
+      const pageHeight = document.documentElement.scrollHeight;
+      if (scrollPosition >= pageHeight - 300) {
+        loadMorePosts();
+      }
+    });
+  </script>
+
+{% endblock %}
