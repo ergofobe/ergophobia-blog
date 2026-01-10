@@ -1,0 +1,53 @@
+{% extends "layout.njk" %}
+
+{% block content %}
+  {% if page.url != '/' and page.date %}
+    <article class="post-page">
+      {% set pageTitle = title or page.data.title %}
+      {% set pageContent = content %}
+
+      {% if pageTitle %}
+        <h1 class="post-page-title">{{ pageTitle }}</h1>
+      {% endif %}
+      <div class="post-page-meta">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;">
+          <time datetime="{{ page.date | formatDate('yyyy-MM-dd') }}" class="post-page-date">
+            {{ page.date | formatDate("MMMM d, yyyy 'at' h:mm a") }}
+          </time>
+          <button class="share-btn"
+                  style="padding: 0.375rem; border-radius: 0.5rem; border: none; background: transparent; cursor: pointer; transition: all 0.15s ease; flex-shrink: 0; position: relative;"
+                  data-url="{{ page.url | absoluteUrl(site.url) }}"
+                  aria-label="Copy post link">
+            <svg class="share-icon" style="width: 1rem; height: 1rem; color: #666; display: block;"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 stroke-linecap="round"
+                 stroke-linejoin="round"
+                 aria-hidden="true">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <svg class="checkmark-icon" style="width: 1rem; height: 1rem; color: var(--accent); display: none;"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="3"
+                 stroke-linecap="round"
+                 stroke-linejoin="round"
+                 aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="copy-tooltip">Copied!</span>
+          </button>
+        </div>
+      </div>
+      <div class="post-page-content">
+        {{ pageContent | safe }}
+      </div>
+    </article>
+  {% else %}
+    {{ content | safe }}
+  {% endif %}
+{% endblock %}

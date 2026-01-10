@@ -117,11 +117,151 @@ export default function (eleventyConfig) {
   // Current year helper
   eleventyConfig.addFilter("year", () => DateTime.now().year);
 
+  // === Video Platform Detection and Helpers ===
+  // Detect video platform from URL
+  eleventyConfig.addFilter("detectVideoPlatform", function (url) {
+    if (!url) return null;
+    
+    // YouTube patterns
+    if (/youtube\.com|youtu\.be/.test(url)) {
+      return "youtube";
+    }
+    
+    // Vimeo patterns
+    if (/vimeo\.com/.test(url)) {
+      return "vimeo";
+    }
+    
+    // Direct video file (MP4, WebM, OGG)
+    if (/\.(mp4|webm|ogg|mov)(\?|$)/i.test(url)) {
+      return "direct";
+    }
+    
+    return null;
+  });
+
+  // Extract YouTube video ID from various URL formats
+  eleventyConfig.addFilter("extractYoutubeId", function (url) {
+    if (!url) return null;
+    
+    // Handle various YouTube URL formats:
+    // https://www.youtube.com/watch?v=VIDEO_ID
+    // https://youtu.be/VIDEO_ID
+    // https://www.youtube.com/embed/VIDEO_ID
+    // https://youtube.com/watch?v=VIDEO_ID
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+      /^([a-zA-Z0-9_-]{11})$/  // Direct video ID
+    ];
+    
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    
+    return null;
+  });
+
+  // Extract Vimeo video ID from URL
+  eleventyConfig.addFilter("extractVimeoId", function (url) {
+    if (!url) return null;
+    
+    // Handle Vimeo URL formats:
+    // https://vimeo.com/VIDEO_ID
+    // https://vimeo.com/album/ALBUM_ID/video/VIDEO_ID
+    // https://player.vimeo.com/video/VIDEO_ID
+    const patterns = [
+      /vimeo\.com\/(?:album\/\d+\/video\/|video\/)?(\d+)/,
+      /player\.vimeo\.com\/video\/(\d+)/
+    ];
+    
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    
+    return null;
+  });
+
+  // Generate poster image URL for MP4 videos (auto-detect common patterns)
+  eleventyConfig.addFilter("getVideoPoster", function (videoUrl, posterUrl) {
+    // If poster URL is explicitly provided, use it
+    if (posterUrl) return posterUrl;
+    
+    if (!videoUrl) return null;
+    
+    // Try to auto-detect poster by replacing video extension with image extensions
+    // Common patterns: video.mp4 -> video.jpg, video.png, video.webp
+    // We'll try jpg first as it's the most common, but you can specify explicitly if needed
+    const posterUrlAuto = videoUrl.replace(/\.(mp4|webm|ogg|mov)(\?|$)/i, '.jpg$2');
+    
+    // Note: The browser will handle 404s gracefully if the image doesn't exist
+    // For best results, explicitly provide a posterUrl in front matter
+    return posterUrlAuto;
+  });
+
   // === Collections ===
   eleventyConfig.addCollection("posts", function (collectionApi) {
     return collectionApi
       .getFilteredByGlob("./posts/**/*.{md,markdown}")
       .sort((a, b) => b.date - a.date);
+  });
+
+  // === Transform: Add captions to images ===
+  // This transform wraps images with alt text in figure/figcaption elements
+  eleventyConfig.addTransform("image-captions", function (content, outputPath) {
+    // Only process HTML files
+    if (!outputPath || !outputPath.endsWith(".html")) {
+      return content;
+    }
+
+    // First pass: handle images inside paragraphs (common markdown behavior)
+    // This regex matches <p>...</p> that contains only an img tag with optional whitespace
+    content = content.replace(/<p[^>]*>\s*(<img([^>]*?)alt="([^"]*?)"([^>]*?)>)\s*<\/p>/gi, (match, imgTag, before, altText, after) => {
+      // Skip if alt text is empty or just whitespace
+      if (!altText || !altText.trim()) {
+        return match;
+      }
+      return `<figure class="image-with-caption">${imgTag}<figcaption class="image-caption">${altText}</figcaption></figure>`;
+    });
+
+    // Second pass: handle standalone img tags (not in paragraphs, not already in figures)
+    // Use a function to check if we're inside a figure tag
+    content = content.replace(/<img([^>]*?)alt="([^"]*?)"([^>]*?)>/gi, (match, before, altText, after, offset, fullString) => {
+      // Skip if alt text is empty or just whitespace
+      if (!altText || !altText.trim()) {
+        return match;
+      }
+
+      // Check if we're already inside a figure tag by looking backwards
+      // Find the last unclosed figure tag before this position
+      const textBefore = fullString.substring(Math.max(0, offset - 500), offset);
+      const figureMatches = [...textBefore.matchAll(/<figure[^>]*>|<\/figure[^>]*>/gi)];
+      
+      let openFigureCount = 0;
+      for (const figureMatch of figureMatches) {
+        if (figureMatch[0].startsWith('</')) {
+          openFigureCount--;
+        } else {
+          openFigureCount++;
+        }
+      }
+
+      // If we're inside an open figure tag, skip this image
+      if (openFigureCount > 0) {
+        return match;
+      }
+
+      // Wrap the image
+      const imgTag = `<img${before}alt="${altText}"${after}>`;
+      return `<figure class="image-with-caption">${imgTag}<figcaption class="image-caption">${altText}</figcaption></figure>`;
+    });
+
+    return content;
   });
 
   // Copy static assets (CSS, JS, images, etc.)

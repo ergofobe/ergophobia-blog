@@ -1,0 +1,12 @@
+# Eleventy ignore file
+# Files and directories listed here will not be processed by Eleventy
+
+README.md
+node_modules/
+package.json
+package-lock.json
+.git/
+.gitignore
+.eleventyignore
+*.log
+examples/

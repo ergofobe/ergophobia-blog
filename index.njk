@@ -69,11 +69,75 @@ permalink: "{% if pagination.pageNumber > 0 %}page/{{ pagination.pageNumber + 1 
           </div>
         </div>
 
-        <div style="padding: 0 0.75rem 0.75rem 0.75rem;">
+        {% set videoUrl = post.data.videoUrl or post.data.youtubeUrl %}
+        {% set isVideoPost = post.data.layout == "video.njk" or post.data.layout == "youtube.njk" or videoUrl %}
+        
+        {% if isVideoPost %}
+          <!-- Video post: embed with padding -->
+          <div class="video-post-container">
+            {% if videoUrl %}
+              {% set platform = videoUrl | detectVideoPlatform %}
+              {% if platform == "youtube" %}
+                {% set videoId = videoUrl | extractYoutubeId %}
+                {% if videoId %}
+                  <div class="video-embed-container-card">
+                    <iframe 
+                      src="https://www.youtube.com/embed/{{ videoId }}"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen
+                      class="video-embed-card">
+                    </iframe>
+                  </div>
+                {% else %}
+                  <p class="video-error" style="font-size: 0.875rem; margin: 0 0.75rem 0.5rem 0.75rem; padding: 0.5rem;">Invalid YouTube URL: {{ videoUrl }}</p>
+                {% endif %}
+              {% elif platform == "vimeo" %}
+                {% set videoId = videoUrl | extractVimeoId %}
+                {% if videoId %}
+                  <div class="video-embed-container-card">
+                    <iframe 
+                      src="https://player.vimeo.com/video/{{ videoId }}"
+                      frameborder="0"
+                      allow="autoplay; fullscreen; picture-in-picture"
+                      allowfullscreen
+                      class="video-embed-card">
+                    </iframe>
+                  </div>
+                {% else %}
+                  <p class="video-error" style="font-size: 0.875rem; margin: 0 0.75rem 0.5rem 0.75rem; padding: 0.5rem;">Invalid Vimeo URL: {{ videoUrl }}</p>
+                {% endif %}
+              {% elif platform == "direct" %}
+                {% set posterUrl = post.data.posterUrl %}
+                {% set videoPoster = videoUrl | getVideoPoster(posterUrl) %}
+                <div class="video-embed-container-card">
+                  <video controls {% if videoPoster %}poster="{{ videoPoster }}"{% endif %} class="video-embed-card">
+                    <source src="{{ videoUrl }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              {% else %}
+                <p class="video-error" style="font-size: 0.875rem; margin: 0 0.75rem 0.5rem 0.75rem; padding: 0.5rem;">Unsupported video URL format: {{ videoUrl }}</p>
+              {% endif %}
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <div style="padding: {% if isVideoPost %}0{% else %}0{% endif %} 0.75rem 0.75rem 0.75rem;">
 
           <!-- Content logic -->
           <div class="prose" style="max-width: none; font-size: 15px; line-height: 1.5;">
-            {% if post | needsExpand %}
+            {% if isVideoPost %}
+              <!-- Video post description -->
+              {% if post.templateContent and post.templateContent | trim %}
+                <div class="video-description-card">
+                  {{ post.templateContent | safe }}
+                </div>
+              {% endif %}
+            {% elif loop.index0 == 0 %}
+              <!-- Most recent post: always show full content -->
+              {{ post.templateContent | safe }}
+            {% elif post | needsExpand %}
               <!-- Long post: show first 2 paragraphs + expand button -->
               <div class="excerpt-content">
                 {{ post | firstTwoParagraphs | safe }}

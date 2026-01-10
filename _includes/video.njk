@@ -1,0 +1,74 @@
+{% extends "layout.njk" %}
+
+{% block content %}
+  {% if page.url != '/' and page.date %}
+    <article class="post-page">
+      {% set pageTitle = title or page.data.title %}
+      {% set videoUrl = videoUrl or page.data.videoUrl or page.data.youtubeUrl %}
+      {% set pageContent = content %}
+
+      {% if pageTitle %}
+        <h1 class="post-page-title">{{ pageTitle }}</h1>
+      {% endif %}
+      <div class="post-page-meta">
+        <time datetime="{{ page.date | formatDate('yyyy-MM-dd') }}" class="post-page-date">
+          {{ page.date | formatDate("MMMM d, yyyy 'at' h:mm a") }}
+        </time>
+      </div>
+      <div class="post-page-content video-content">
+        {% if videoUrl %}
+          {% set platform = videoUrl | detectVideoPlatform %}
+          {% if platform == "youtube" %}
+            {% set videoId = videoUrl | extractYoutubeId %}
+            {% if videoId %}
+              <div class="video-embed-container">
+                <iframe 
+                  src="https://www.youtube.com/embed/{{ videoId }}"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                  class="video-embed">
+                </iframe>
+              </div>
+            {% else %}
+              <p class="video-error">Invalid YouTube URL: {{ videoUrl }}</p>
+            {% endif %}
+          {% elif platform == "vimeo" %}
+            {% set videoId = videoUrl | extractVimeoId %}
+            {% if videoId %}
+              <div class="video-embed-container">
+                <iframe 
+                  src="https://player.vimeo.com/video/{{ videoId }}"
+                  frameborder="0"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowfullscreen
+                  class="video-embed">
+                </iframe>
+              </div>
+            {% else %}
+              <p class="video-error">Invalid Vimeo URL: {{ videoUrl }}</p>
+            {% endif %}
+          {% elif platform == "direct" %}
+            {% set posterUrl = posterUrl or page.data.posterUrl %}
+            {% set videoPoster = videoUrl | getVideoPoster(posterUrl) %}
+            <div class="video-embed-container">
+              <video controls {% if videoPoster %}poster="{{ videoPoster }}"{% endif %} class="video-embed">
+                <source src="{{ videoUrl }}" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          {% else %}
+            <p class="video-error">Unsupported video URL format: {{ videoUrl }}</p>
+          {% endif %}
+        {% endif %}
+        {% if pageContent and pageContent | trim %}
+          <div class="video-description">
+            {{ pageContent | safe }}
+          </div>
+        {% endif %}
+      </div>
+    </article>
+  {% else %}
+    {{ content | safe }}
+  {% endif %}
+{% endblock %}

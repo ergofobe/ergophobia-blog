@@ -88,6 +88,59 @@
         });
       }
     })();
+
+    // Share button functionality - runs on page load
+    (function() {
+      function attachShareListeners() {
+        document.querySelectorAll('.share-btn').forEach(btn => {
+          // Skip if already has listener
+          if (btn.dataset.shareListenerAttached) return;
+          btn.dataset.shareListenerAttached = 'true';
+          
+          btn.addEventListener('click', async function() {
+            const url = this.getAttribute('data-url');
+            const shareIcon = this.querySelector('.share-icon');
+            const checkmarkIcon = this.querySelector('.checkmark-icon');
+            const tooltip = this.querySelector('.copy-tooltip');
+            
+            try {
+              await navigator.clipboard.writeText(url);
+
+              // Switch to checkmark icon
+              if (shareIcon) shareIcon.style.display = 'none';
+              if (checkmarkIcon) checkmarkIcon.style.display = 'block';
+              
+              // Show tooltip
+              if (tooltip) {
+                tooltip.style.opacity = '1';
+                tooltip.style.visibility = 'visible';
+              }
+
+              // Reset after 2 seconds
+              setTimeout(() => {
+                if (shareIcon) shareIcon.style.display = 'block';
+                if (checkmarkIcon) checkmarkIcon.style.display = 'none';
+                if (tooltip) {
+                  tooltip.style.opacity = '0';
+                  tooltip.style.visibility = 'hidden';
+                }
+              }, 2000);
+
+            } catch (err) {
+              console.error('Copy failed', err);
+              prompt('Copy failed — copy manually:', url);
+            }
+          });
+        });
+      }
+
+      // Initialize share listeners on page load
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attachShareListeners);
+      } else {
+        attachShareListeners();
+      }
+    })();
   </script>
 </head>
 <body>
@@ -117,25 +170,7 @@
   </header>
   <main>
     {% block content %}
-      {% if page.url != '/' and page.date %}
-        <!-- Individual post page: show title and date -->
-        <article class="post-page">
-          {% if title %}
-            <h1 class="post-page-title">{{ title }}</h1>
-          {% endif %}
-          <div class="post-page-meta">
-            <time datetime="{{ page.date | formatDate('yyyy-MM-dd') }}" class="post-page-date">
-              {{ page.date | formatDate("MMMM d, yyyy 'at' h:mm a") }}
-            </time>
-          </div>
-          <div class="post-page-content">
-            {{ content | safe }}
-          </div>
-        </article>
-      {% else %}
-        <!-- Index page or other pages -->
-        {{ content | safe }}
-      {% endif %}
+      {{ content | safe }}
     {% endblock %}
   </main>
   <footer class="site-footer">

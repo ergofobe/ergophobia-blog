@@ -154,6 +154,22 @@ a:hover {
   opacity: 1;
 }
 
+/* Share button in article view */
+.post-page-meta .share-btn {
+  padding: 0.375rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.post-page-meta .share-btn:hover {
+  background: var(--light);
+}
+
 .post-page-content {
   color: var(--text);
   line-height: 1.7;
@@ -251,14 +267,186 @@ a:hover {
 .post-page-content img {
   max-width: 100%;
   height: auto;
-  margin-bottom: 1.25rem;
+  margin-bottom: 0;
   border-radius: 4px;
+  display: block;
+}
+
+.post-page-content p img {
+  margin-top: 1.25rem;
+}
+
+/* Image with caption styling in article view */
+.post-page-content figure.image-with-caption {
+  margin: 1.25rem 0;
+  max-width: 100%;
+}
+
+.post-page-content figure.image-with-caption img {
+  margin-bottom: 0;
+}
+
+.post-page-content figcaption.image-caption {
+  font-size: 0.8125rem;
+  color: var(--text);
+  opacity: 0.65;
+  margin-top: 0.5rem;
+  text-align: center;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.post-page-content p:has(figure.image-with-caption) {
+  margin: 0;
+}
+
+/* Responsive embedded videos/iframes in article content */
+.post-page-content .article-video-embed {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  margin: 1.5rem 0;
+  border-radius: 6px;
+  background: var(--light);
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+}
+
+.article-video-embed iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.post-page-content p:has(.article-video-embed) {
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure video embed respects parent container width */
+.post-page-content > .article-video-embed {
+  width: 100%;
+  max-width: 100%;
 }
 
 .post-page-content hr {
   border: none;
   border-top: 1px solid var(--border);
   margin: 2rem 0;
+}
+
+
+/* Video Post Container in Cards */
+.video-post-container {
+  padding: 0 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Video Embed in Post Cards */
+.video-embed-container-card {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+  width: 100%;
+  margin: 0;
+  border-radius: 6px;
+  background: var(--light);
+  border: 1px solid var(--border);
+}
+
+.video-embed-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Direct video files in cards */
+.video-embed-container-card video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.video-description-card {
+  margin-top: 0.5rem;
+}
+
+.video-description-card p {
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+  font-size: 15px;
+}
+
+.video-description-card p:last-child {
+  margin-bottom: 0;
+}
+
+/* Video Error Messages */
+.video-error {
+  color: #dc3545;
+  padding: 0.75rem;
+  background: rgba(220, 53, 69, 0.1);
+  border-left: 4px solid #dc3545;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+
+/* Full page video embeds (in article.njk / video.njk) */
+.video-embed-container {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+  max-width: 100%;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--light);
+}
+
+.video-embed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Direct video files on full page */
+.video-embed-container video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.video-description {
+  margin-top: 1.5rem;
+}
+
+.video-description p {
+  margin-bottom: 1.25rem;
+  line-height: 1.7;
+}
+
+.video-content {
+  /* Additional styling for video posts if needed */
 }
 
 /* Theme toggle icon visibility */
@@ -429,6 +617,10 @@ main article a:hover {
   color: var(--text);
   font-size: 15px;
   line-height: 1.5;
+  position: relative; /* Establish positioning context for absolute children */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .post-card .prose p {
@@ -459,6 +651,102 @@ main article a:hover {
   margin: 0;
   font-size: 15px;
   line-height: 1.5;
+  position: relative; /* Ensure absolute children are positioned relative to this container */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Images in post cards (both excerpt and full content) */
+.post-card .prose img,
+.post-card .excerpt-content img,
+.post-card .full-content img {
+  max-width: 100%;
+  height: auto;
+  margin: 0;
+  border-radius: 4px;
+  display: block;
+}
+
+.post-card .prose p img,
+.post-card .excerpt-content p img,
+.post-card .full-content p img {
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+}
+
+/* Image with caption styling in post cards */
+.post-card .prose figure.image-with-caption,
+.post-card .excerpt-content figure.image-with-caption,
+.post-card .full-content figure.image-with-caption {
+  margin: 0.75rem 0;
+  max-width: 100%;
+}
+
+.post-card .prose figure.image-with-caption img,
+.post-card .excerpt-content figure.image-with-caption img,
+.post-card .full-content figure.image-with-caption img {
+  margin-bottom: 0;
+}
+
+.post-card .prose figcaption.image-caption,
+.post-card .excerpt-content figcaption.image-caption,
+.post-card .full-content figcaption.image-caption {
+  font-size: 0.75rem;
+  color: var(--text);
+  opacity: 0.6;
+  margin-top: 0.375rem;
+  text-align: center;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.post-card .prose p:has(figure.image-with-caption),
+.post-card .excerpt-content p:has(figure.image-with-caption),
+.post-card .full-content p:has(figure.image-with-caption) {
+  margin: 0;
+}
+
+/* Video embeds in post cards (both excerpt and full content) */
+.post-card .prose .article-video-embed,
+.post-card .excerpt-content .article-video-embed,
+.post-card .full-content .article-video-embed {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  margin: 0.75rem 0;
+  border-radius: 6px;
+  background: var(--light);
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+}
+
+.post-card .prose .article-video-embed iframe,
+.post-card .excerpt-content .article-video-embed iframe,
+.post-card .full-content .article-video-embed iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Ensure paragraph wrapping doesn't affect video positioning */
+.post-card .prose p:has(.article-video-embed),
+.post-card .excerpt-content p:has(.article-video-embed),
+.post-card .full-content p:has(.article-video-embed) {
+  margin: 0;
+  padding: 0;
+}
+
+.post-card .prose > .article-video-embed,
+.post-card .excerpt-content > .article-video-embed,
+.post-card .full-content > .article-video-embed {
+  margin: 0.75rem 0;
 }
 
 /* ============================================
@@ -639,6 +927,14 @@ main article a:hover {
   color: var(--accent);
 }
 
+:root.dark-mode .post-page-meta .share-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+:root.dark-mode .post-page-meta .share-btn svg {
+  color: #c9d1d9;
+}
+
 /* System preference dark mode (when no manual selection) */
 @media (prefers-color-scheme: dark) {
   :root:not(.light-mode) .post-card {
@@ -697,6 +993,14 @@ main article a:hover {
 
   :root:not(.light-mode) .post-card .date-link:hover time {
     color: var(--accent);
+  }
+
+  :root:not(.light-mode) .post-page-meta .share-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  :root:not(.light-mode) .post-page-meta .share-btn svg {
+    color: #c9d1d9;
   }
 
   :root:not(.light-mode) #theme-toggle-moon {
