@@ -23,7 +23,7 @@ permalink: "{% if pagination.pageNumber > 0 %}page/{{ pagination.pageNumber + 1 
               <h2 class="post-title" 
                   style="font-size: 1.125rem; font-weight: 600; margin: 0; line-height: 1.4; letter-spacing: -0.01em;"
                   data-full-title="{{ post.data.title }}">
-                <a href="{{ post.url }}" style="display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ post.data.title }}</a>
+                <a href="{{ post.url | relativeUrl(page.url) }}" style="display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ post.data.title }}</a>
               </h2>
               <div class="title-tooltip" style="display: none; opacity: 0; visibility: hidden;">{{ post.data.title }}</div>
             {% endif %}
@@ -31,7 +31,7 @@ permalink: "{% if pagination.pageNumber > 0 %}page/{{ pagination.pageNumber + 1 
 
           <!-- Date/time and copy button (right-aligned) -->
           <div style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
-            <a href="{{ post.url }}" class="date-link" style="text-decoration: none; color: inherit;">
+            <a href="{{ post.url | relativeUrl(page.url) }}" class="date-link" style="text-decoration: none; color: inherit;">
               <time datetime="{{ post.date | formatDate('yyyy-MM-dd') }}" 
                     style="font-size: 0.75rem; color: #666; white-space: nowrap; cursor: pointer; transition: color 0.15s ease;">
                 {{ post.date | formatDate("MMM d, yyyy 'at' h:mm a") }}
@@ -323,7 +323,9 @@ permalink: "{% if pagination.pageNumber > 0 %}page/{{ pagination.pageNumber + 1 
     });
 
     // Infinite scroll
-    let currentPage = 1;
+    // Detect current page from URL
+    const pathMatch = window.location.pathname.match(/\/page\/(\d+)\//);
+    let currentPage = pathMatch ? parseInt(pathMatch[1], 10) : 1;
     let loading = false;
     let hasMore = true;
 
@@ -331,7 +333,14 @@ permalink: "{% if pagination.pageNumber > 0 %}page/{{ pagination.pageNumber + 1 
       if (loading || !hasMore) return;
       loading = true;
       currentPage++;
-      const nextUrl = `/page/${currentPage}/`;
+      // Calculate relative path based on current location for GitHub Pages compatibility
+      // From root: page/2/ works
+      // From /page/2/: need ../page/3/ to go up one level then down
+      const currentPath = window.location.pathname.replace(/\/$/, '').replace(/\/index\.html$/, '');
+      // Count depth: /page/2/ has 2 segments, root has 0
+      const depth = currentPath.split('/').filter(p => p && p !== '').length;
+      const relativePrefix = depth === 0 ? '' : '../'.repeat(depth);
+      const nextUrl = `${relativePrefix}page/${currentPage}/`;
       fetch(nextUrl)
         .then(response => {
           if (!response.ok) {

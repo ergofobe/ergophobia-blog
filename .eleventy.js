@@ -12,6 +12,38 @@ export default function (eleventyConfig) {
     }
   });
 
+  // Convert absolute URLs (starting with /) to relative paths for GitHub Pages
+  eleventyConfig.addFilter("relativeUrl", function (url, currentPageUrl) {
+    if (!url) return url;
+    
+    // If it's not an absolute path, return as-is
+    if (!url.startsWith('/')) {
+      return url;
+    }
+    
+    // Normalize current page URL - remove trailing slash and handle index.html
+    const currentPath = (currentPageUrl || '/').replace(/\/$/, '').replace(/\/index\.html$/, '');
+    
+    // Calculate depth of current page (number of path segments)
+    const depth = currentPath.split('/').filter(p => p && p !== '').length;
+    
+    // Handle root path
+    if (url === '/' || url === '/index.html') {
+      return depth === 0 ? 'index.html' : '../'.repeat(depth) + 'index.html';
+    }
+    
+    // Remove leading slash for relative path
+    let relativePath = url.slice(1);
+    
+    if (depth === 0) {
+      // We're at root, return path as-is
+      return relativePath;
+    } else {
+      // We're in a subdirectory, prepend ../ for each level
+      return '../'.repeat(depth) + relativePath;
+    }
+  });
+
   // === Content Helpers ===
   const MAX_EXCERPT_LENGTH = 250;
 

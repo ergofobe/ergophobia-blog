@@ -11,7 +11,7 @@
     <meta property="og:description" content="{{ description or (content | excerpt) }}">
     <meta property="og:type" content="article">
     <meta property="og:url" content="{{ page.url | absoluteUrl(site.url) }}">
-    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="{{ '/styles/main.css' | relativeUrl(page.url) }}">
   <script>
     // Theme toggle functionality - runs immediately to set initial theme
     (function() {
@@ -146,7 +146,7 @@
 <body>
   <header class="site-header">
     <h1 class="site-title">
-      <a href="/">Ergophobia</a>
+      <a href="{{ '/' | relativeUrl(page.url) }}">Ergophobia</a>
     </h1>
     <button id="theme-toggle" 
             aria-label="Toggle dark mode"
@@ -179,7 +179,7 @@
     </p>
     {% if page.url != '/' %}
       <p class="back-link">
-        <a href="/">← Back to feed</a>
+        <a href="{{ '/' | relativeUrl(page.url) }}">← Back to feed</a>
       </p>
     {% endif %}
   </footer>
