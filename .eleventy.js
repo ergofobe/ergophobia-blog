@@ -296,6 +296,74 @@ export default function (eleventyConfig) {
     return content;
   });
 
+  // === Transform: Convert absolute asset paths to relative paths ===
+  // This handles images and links from markdown content that use absolute paths
+  eleventyConfig.addTransform("relative-asset-paths", function (content, outputPath) {
+    // Only process HTML files
+    if (!outputPath || !outputPath.endsWith(".html")) {
+      return content;
+    }
+
+    // Calculate depth of current page based on output path
+    // Handle both absolute paths (full system path) and relative paths
+    // e.g., "/full/path/to/_site/posts/2026-01-09-intro/index.html" -> depth 2
+    // e.g., "_site/posts/2026-01-09-intro/index.html" -> depth 2
+    // e.g., "_site/index.html" -> depth 0
+    let pathRelativeToOutput = outputPath;
+    
+    // If it's an absolute path, find the _site directory
+    const siteDirMatch = pathRelativeToOutput.match(/[\/\\]_site[\/\\](.+)$/i);
+    if (siteDirMatch) {
+      pathRelativeToOutput = siteDirMatch[1];
+    } else {
+      // Relative path, remove _site/ if present
+      pathRelativeToOutput = pathRelativeToOutput.replace(/^_site[\/\\]/, '');
+    }
+    
+    // Split by both forward and back slashes for cross-platform compatibility
+    const pathSegments = pathRelativeToOutput.split(/[\/\\]/).filter(p => p && p !== 'index.html');
+    const depth = pathSegments.length;
+
+    // Helper function to convert absolute path to relative
+    function makeRelative(absPath) {
+      if (!absPath || !absPath.startsWith('/')) {
+        return absPath; // Already relative or not a path
+      }
+
+      // Remove leading slash
+      const relativePath = absPath.slice(1);
+
+      if (depth === 0) {
+        // We're at root, return path as-is
+        return relativePath;
+      } else {
+        // We're in a subdirectory, prepend ../ for each level
+        return '../'.repeat(depth) + relativePath;
+      }
+    }
+
+    // Convert absolute paths in src attributes (images, videos, etc.)
+    content = content.replace(/src=["'](\/[^"']+)["']/gi, (match, src) => {
+      const relativeSrc = makeRelative(src);
+      return `src="${relativeSrc}"`;
+    });
+
+    // Convert absolute paths in href attributes for asset links
+    // Only process asset paths, not page navigation links (those are handled by relativeUrl filter)
+    content = content.replace(/href=["'](\/(?:assets|images|styles)\/[^"']+)["']/gi, (match, href) => {
+      const relativeHref = makeRelative(href);
+      return `href="${relativeHref}"`;
+    });
+
+    // Convert absolute paths in poster attributes (video posters)
+    content = content.replace(/poster=["'](\/[^"']+)["']/gi, (match, poster) => {
+      const relativePoster = makeRelative(poster);
+      return `poster="${relativePoster}"`;
+    });
+
+    return content;
+  });
+
   // Copy static assets (CSS, JS, images, etc.)
   eleventyConfig.addPassthroughCopy("styles");
   eleventyConfig.addPassthroughCopy("assets");
