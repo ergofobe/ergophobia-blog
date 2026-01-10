@@ -1,136 +1,151 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ title or "Ergophobia" }}</title>
-  
-  <!-- Basic meta -->
-  <meta name="description" content="{{ description or (content | excerpt) }}">
-  
-  <!-- Open Graph for nice link previews when shared -->
-  <meta property="og:title" content="{{ title or 'Ergophobia' }}">
-  <meta property="og:description" content="{{ description or (content | excerpt) }}">
-  <meta property="og:type" content="article">
-  <meta property="og:url" content="{{ page.url | absoluteUrl(site.url) }}">
-  <!-- Optional: add when you have images
-  <meta property="og:image" content="{{ '/images/featured.jpg' | absoluteUrl(site.url) }}"> -->
-
-  <style>
-    :root {
-      --bg: #ffffff;
-      --text: #111111;
-      --light: #f5f5f5;
-      --accent: #0066cc;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #111111;
-        --text: #eeeeee;
-        --light: #222222;
-        --accent: #6699ff;
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title or "Ergophobia" }}</title>
+    <!-- Basic meta -->
+    <meta
+    name="description" content="{{ description or (content | excerpt) }}"> <!-- Open Graph for nice link previews when shared -->
+    <meta property="og:title" content="{{ title or 'Ergophobia' }}">
+    <meta property="og:description" content="{{ description or (content | excerpt) }}">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{ page.url | absoluteUrl(site.url) }}">
+    <link rel="stylesheet" href="/styles/main.css">
+  <script>
+    // Theme toggle functionality - runs immediately to set initial theme
+    (function() {
+      // Get saved theme or default to system preference
+      function getInitialTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+          return savedTheme;
+        }
+        // Check system preference
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       }
-    }
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 2rem 1rem;
-      line-height: 1.6;
-    }
-    h1, h2 { margin-top: 2rem; }
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .post-excerpt {
-      margin-bottom: 2.5rem;
-      padding-bottom: 1.5rem;
-    }
-    .date {
-      color: #666;
-      font-size: 0.95rem;
-      margin: 0.5rem 0 1rem;
-    }
-    .post-footer {
-      margin-top: 3rem;
-      text-align: center;
-    }
-    #copy-feedback {
-      margin-left: 1rem;
-      color: #777;
-      font-style: italic;
-    }
-    .excerpt-content {
-      font-size: 1.05rem;
-      line-height: 1.5;
-    }
-    .read-more {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 500;
-      margin-left: 0.3rem;
-      cursor: pointer;
-    }
-    .read-more:hover {
-      text-decoration: underline;
-    }
-    .meta time {
-      font-size: 0.875rem;
-      color: #777;
-    }
-    .post-card {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.25rem 1.5rem;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.post-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  border-color: var(--accent);
-  transform: translateY(-2px);
-}
-
-.post-card .excerpt-content p,
-.post-card .full-content {
-  margin: 0;
-  font-size: 1.05rem;
-  line-height: 1.5;
-}
-
-.post-card .meta {
-  opacity: 0.9;
-}
-
-.post-card .meta time {
-  font-size: 0.875rem;
-}
-  </style>
+      
+      // Apply theme (can run before DOM is ready for initial theme)
+      function setTheme(theme, updateIcons) {
+        const root = document.documentElement;
+        if (theme === 'dark') {
+          root.classList.add('dark-mode');
+          root.classList.remove('light-mode');
+          if (updateIcons) {
+            const themeToggleSun = document.getElementById('theme-toggle-sun');
+            const themeToggleMoon = document.getElementById('theme-toggle-moon');
+            if (themeToggleSun) themeToggleSun.style.display = 'block';
+            if (themeToggleMoon) themeToggleMoon.style.display = 'none';
+          }
+        } else {
+          root.classList.add('light-mode');
+          root.classList.remove('dark-mode');
+          if (updateIcons) {
+            const themeToggleSun = document.getElementById('theme-toggle-sun');
+            const themeToggleMoon = document.getElementById('theme-toggle-moon');
+            if (themeToggleSun) themeToggleSun.style.display = 'none';
+            if (themeToggleMoon) themeToggleMoon.style.display = 'block';
+          }
+        }
+        localStorage.setItem('theme', theme);
+      }
+      
+      // Initialize theme immediately (before DOM ready for faster rendering)
+      const initialTheme = getInitialTheme();
+      setTheme(initialTheme, false);
+      
+      // Wait for DOM to be ready to set up toggle button
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initThemeToggle);
+      } else {
+        initThemeToggle();
+      }
+      
+      function initThemeToggle() {
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeToggleSun = document.getElementById('theme-toggle-sun');
+        const themeToggleMoon = document.getElementById('theme-toggle-moon');
+        
+        // Update icons for current theme
+        const currentTheme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
+        setTheme(currentTheme, true);
+        
+        // Handle toggle button click
+        if (themeToggle) {
+          themeToggle.addEventListener('click', function() {
+            const currentTheme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme, true);
+          });
+        }
+        
+        // Listen for system theme changes (optional)
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+          // Only update if user hasn't manually set a preference
+          if (!localStorage.getItem('theme')) {
+            setTheme(e.matches ? 'dark' : 'light', true);
+          }
+        });
+      }
+    })();
+  </script>
 </head>
 <body>
-  <header>
-    <h1><a href="/">{{ title or "Ergophobia" }}</a></h1>
+  <header class="site-header">
+    <h1 class="site-title">
+      <a href="/">Ergophobia</a>
+    </h1>
+    <button id="theme-toggle" 
+            aria-label="Toggle dark mode"
+            title="Toggle dark/light mode"
+            class="theme-toggle-btn">
+      <svg id="theme-toggle-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+      <svg id="theme-toggle-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
   </header>
-
   <main>
-    {% block content %}{% endblock %}
+    {% block content %}
+      {% if page.url != '/' and page.date %}
+        <!-- Individual post page: show title and date -->
+        <article class="post-page">
+          {% if title %}
+            <h1 class="post-page-title">{{ title }}</h1>
+          {% endif %}
+          <div class="post-page-meta">
+            <time datetime="{{ page.date | formatDate('yyyy-MM-dd') }}" class="post-page-date">
+              {{ page.date | formatDate("MMMM d, yyyy 'at' h:mm a") }}
+            </time>
+          </div>
+          <div class="post-page-content">
+            {{ content | safe }}
+          </div>
+        </article>
+      {% else %}
+        <!-- Index page or other pages -->
+        {{ content | safe }}
+      {% endif %}
+    {% endblock %}
   </main>
-
-  <script>
-    // Copy link functionality
-    document.getElementById('copy-link').addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        const feedback = document.getElementById('copy-feedback');
-        feedback.textContent = 'Link copied!';
-        setTimeout(() => { feedback.textContent = ''; }, 3000);
-      } catch (err) {
-        prompt('Copy failed — please copy manually:', window.location.href);
-      }
-    });
-  </script>
-</body>
-</html>
+  <footer class="site-footer">
+    <p>
+      © {{ "now" | formatDate('yyyy') }} Ergophobia
+    </p>
+    {% if page.url != '/' %}
+      <p class="back-link">
+        <a href="/">← Back to feed</a>
+      </p>
+    {% endif %}
+  </footer>
+</body></html>

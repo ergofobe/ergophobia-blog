@@ -10,78 +10,255 @@ permalink: "{% if pagination.pageNumber > 0 %}page/{{ pagination.pageNumber + 1 
 
 {% block content %}
 
-  <section id="posts-list" style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;">
+  <section id="posts-list" style="margin-top: 1.5rem;">
+
     {% for post in posts %}
-      <article class="post-card" 
-               id="post-{{ loop.index }}">
+      <article class="post-card">
 
-        <!-- Excerpt view -->
-        <div class="excerpt-content">
-          <p style="margin: 0 0 1rem 0;">
-            {{ post.templateContent | excerpt | safe }}
-            <button class="read-more" 
-                    data-action="expand" 
-                    title="Expand full post"
-                    style="background: none; border: none; color: var(--accent); font-size: 1.4rem; cursor: pointer; padding: 0 4px; line-height: 1; vertical-align: middle;">
-              …
+        <!-- Top metadata bar with title, date/time, and copy button -->
+        <div class="metadata-section" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0.75rem 0.5rem 0.75rem; margin: 0; gap: 0.75rem;">
+          <!-- Title (left-aligned, truncated if needed) -->
+          <div class="post-title-wrapper" style="flex: 1; min-width: 0; overflow: hidden; position: relative;">
+            {% if post.data.title %}
+              <h2 class="post-title" 
+                  style="font-size: 1.125rem; font-weight: 600; margin: 0; line-height: 1.4; letter-spacing: -0.01em;"
+                  data-full-title="{{ post.data.title }}">
+                <a href="{{ post.url }}" style="display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ post.data.title }}</a>
+              </h2>
+              <div class="title-tooltip" style="display: none; opacity: 0; visibility: hidden;">{{ post.data.title }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Date/time and copy button (right-aligned) -->
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
+            <a href="{{ post.url }}" class="date-link" style="text-decoration: none; color: inherit;">
+              <time datetime="{{ post.date | formatDate('yyyy-MM-dd') }}" 
+                    style="font-size: 0.75rem; color: #666; white-space: nowrap; cursor: pointer; transition: color 0.15s ease;">
+                {{ post.date | formatDate("MMM d, yyyy 'at' h:mm a") }}
+              </time>
+            </a>
+
+            <!-- Fixed share button -->
+            <button class="share-btn"
+                    style="padding: 0.375rem; border-radius: 0.5rem; border: none; background: transparent; cursor: pointer; transition: all 0.15s ease; flex-shrink: 0; position: relative;"
+                    data-url="{{ post.url | absoluteUrl(site.url) }}"
+                    aria-label="Copy post link">
+              <svg class="share-icon" style="width: 1rem; height: 1rem; color: #666; display: block;"
+                   viewBox="0 0 24 24"
+                   fill="none"
+                   stroke="currentColor"
+                   stroke-width="2"
+                   stroke-linecap="round"
+                   stroke-linejoin="round"
+                   aria-hidden="true">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <svg class="checkmark-icon" style="width: 1rem; height: 1rem; color: var(--accent); display: none;"
+                   viewBox="0 0 24 24"
+                   fill="none"
+                   stroke="currentColor"
+                   stroke-width="3"
+                   stroke-linecap="round"
+                   stroke-linejoin="round"
+                   aria-hidden="true">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span class="copy-tooltip">Copied!</span>
             </button>
-          </p>
+          </div>
         </div>
 
-        <!-- Full content (hidden initially) -->
-        <div class="full-content" style="display: none;">
-          {{ post.templateContent | safe }}
+        <div style="padding: 0 0.75rem 0.75rem 0.75rem;">
+
+          <!-- Content logic -->
+          <div class="prose" style="max-width: none; font-size: 15px; line-height: 1.5;">
+            {% if post | needsExpand %}
+              <!-- Long post: show first 2 paragraphs + expand button -->
+              <div class="excerpt-content">
+                {{ post | firstTwoParagraphs | safe }}
+              </div>
+
+              <div style="margin-top: 0.5rem;">
+                <button class="read-more"
+                        data-action="expand"
+                        aria-expanded="false"
+                        aria-label="Show full post">
+                  Show more
+                </button>
+              </div>
+
+              <!-- Hidden full content -->
+              <div class="full-content hidden mt-4">
+                {{ post.templateContent | safe }}
+              </div>
+            {% else %}
+              <!-- Short post: show full content directly -->
+              {{ post.templateContent | safe }}
+            {% endif %}
+          </div>
+
         </div>
 
-        <!-- Meta row: date + share icon (right-aligned) -->
-        <div class="meta" style="display: flex; justify-content: flex-end; align-items: center; gap: 1rem; font-size: 0.875rem; color: #777; margin-top: 1rem;">
-  	  <time datetime="{{ post.pageEffectiveDate | date('YYYY-MM-DD') }}">
-            {{ post.pageEffectiveDate | date }}
-          </time>
-
-          <button class="share-btn" 
-                  title="Copy link to this post" 
-                  data-url="{{ page.url | absoluteUrl(site.url) }}{{ post.url }}" 
-                  style="background: none; border: none; cursor: pointer; padding: 0; line-height: 1; width: 20px; height: 20px; display: flex; align-items: center;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M18 16.08C17.24 16.08 16.56 16.38 16.04 16.85L8.91 12.7C8.96 12.47 9 12.24 9 12C9 11.76 8.96 11.53 8.91 11.3L15.96 7.19C16.5 7.69 17.21 8 18 8C19.66 8 21 6.66 21 5C21 3.34 19.66 2 18 2C16.34 2 15 3.34 15 5C15 5.24 15.04 5.47 15.09 5.7L8.04 9.81C7.5 9.31 6.79 9 6 9C4.34 9 3 10.34 3 12C3 13.66 4.34 15 6 15C6.79 15 7.5 14.69 8.04 14.19L15.16 18.35C15.11 18.56 15.08 18.78 15.08 19C15.08 20.61 16.39 21.92 18 21.92C19.61 21.92 20.92 20.61 20.92 19C20.92 17.39 19.61 16.08 18 16.08Z" fill="#666"/>
-            </svg>
-          </button>
-        </div>
       </article>
     {% endfor %}
+
   </section>
 
+  <!-- JavaScript -->
   <script>
-    // Expand full post inline
-    document.querySelectorAll('.read-more[data-action="expand"]').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const article = this.closest('.post-card');
-        const excerptDiv = article.querySelector('.excerpt-content');
-        const fullDiv = article.querySelector('.full-content');
+    // Function to attach expand listeners
+    function attachExpandListeners() {
+      document.querySelectorAll('.read-more[data-action="expand"]').forEach(btn => {
+        // Skip if already has listener
+        if (btn.dataset.expandListenerAttached) return;
+        btn.dataset.expandListenerAttached = 'true';
         
-        excerptDiv.style.display = 'none';
-        fullDiv.style.display = 'block';
-        this.remove();
-      });
-    });
+        btn.addEventListener('click', function() {
+          const article = this.closest('.post-card');
+          const excerpt = article.querySelector('.excerpt-content');
+          const full = article.querySelector('.full-content');
+          const moreBtn = this.closest('div');
 
-    // Per-post copy link
-    document.querySelectorAll('.share-btn').forEach(btn => {
-      btn.addEventListener('click', async function() {
-        const url = this.getAttribute('data-url');
-        try {
-          await navigator.clipboard.writeText(url);
-          this.style.opacity = '0.6';
-          setTimeout(() => { this.style.opacity = '1'; }, 1500);
-        } catch (err) {
-          console.error('Copy failed', err);
-          prompt('Copy failed — copy manually:', url);
+          if (excerpt) excerpt.style.display = 'none';
+          if (moreBtn) moreBtn.style.display = 'none';
+          if (full) {
+            // Remove hidden class and show content
+            full.classList.remove('hidden');
+            full.style.display = 'block';
+            // Trigger animation by forcing reflow
+            full.offsetHeight;
+          }
+
+          // Update accessibility attributes
+          this.setAttribute('aria-expanded', 'true');
+          this.setAttribute('aria-label', 'Post expanded');
+        });
+      });
+    }
+
+    // Function to attach share button listeners
+    function attachShareListeners() {
+      document.querySelectorAll('.share-btn').forEach(btn => {
+        // Skip if already has listener
+        if (btn.dataset.shareListenerAttached) return;
+        btn.dataset.shareListenerAttached = 'true';
+        
+        btn.addEventListener('click', async function() {
+          const url = this.getAttribute('data-url');
+          const shareIcon = this.querySelector('.share-icon');
+          const checkmarkIcon = this.querySelector('.checkmark-icon');
+          const tooltip = this.querySelector('.copy-tooltip');
+          
+          try {
+            await navigator.clipboard.writeText(url);
+
+            // Switch to checkmark icon
+            if (shareIcon) shareIcon.style.display = 'none';
+            if (checkmarkIcon) checkmarkIcon.style.display = 'block';
+            
+            // Show tooltip
+            if (tooltip) {
+              tooltip.style.opacity = '1';
+              tooltip.style.visibility = 'visible';
+            }
+
+            // Reset after 2 seconds
+            setTimeout(() => {
+              if (shareIcon) shareIcon.style.display = 'block';
+              if (checkmarkIcon) checkmarkIcon.style.display = 'none';
+              if (tooltip) {
+                tooltip.style.opacity = '0';
+                tooltip.style.visibility = 'hidden';
+              }
+            }, 2000);
+
+          } catch (err) {
+            console.error('Copy failed', err);
+            prompt('Copy failed — copy manually:', url);
+          }
+        });
+      });
+    }
+
+    // Function to check if title is truncated and enable tooltip
+    function checkTitleTruncation() {
+      document.querySelectorAll('.post-title').forEach(titleEl => {
+        const titleLink = titleEl.querySelector('a');
+        const titleWrapper = titleEl.parentElement;
+        const tooltip = titleWrapper.querySelector('.title-tooltip');
+        
+        if (titleLink && tooltip) {
+          // Skip if already has listener
+          if (titleWrapper.dataset.tooltipListenerAttached) {
+            // Recheck truncation status
+            const isTruncated = titleLink.scrollWidth > titleLink.offsetWidth;
+            if (isTruncated) {
+              tooltip.style.display = 'block';
+            } else {
+              tooltip.style.display = 'none';
+            }
+            return;
+          }
+          
+          // Check if text is truncated
+          // Use a small delay to ensure DOM is fully rendered
+          setTimeout(() => {
+            const isTruncated = titleLink.scrollWidth > titleLink.offsetWidth;
+            
+            if (isTruncated) {
+              titleEl.classList.add('is-truncated');
+              tooltip.style.display = 'block';
+              tooltip.style.opacity = '0';
+              tooltip.style.visibility = 'hidden';
+              
+              // Mark as having listener attached
+              titleWrapper.dataset.tooltipListenerAttached = 'true';
+              
+              // Show tooltip on hover using JavaScript (like copy tooltip)
+              titleWrapper.addEventListener('mouseenter', function() {
+                const tip = this.querySelector('.title-tooltip');
+                if (tip && tip.style.display !== 'none') {
+                  tip.style.opacity = '1';
+                  tip.style.visibility = 'visible';
+                }
+              });
+              
+              titleWrapper.addEventListener('mouseleave', function() {
+                const tip = this.querySelector('.title-tooltip');
+                if (tip) {
+                  tip.style.opacity = '0';
+                  tip.style.visibility = 'hidden';
+                }
+              });
+            } else {
+              titleEl.classList.remove('is-truncated');
+              tooltip.style.display = 'none';
+            }
+          }, 100);
         }
       });
+    }
+
+    // Initialize listeners on page load
+    attachExpandListeners();
+    attachShareListeners();
+    
+    // Check title truncation after page load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', checkTitleTruncation);
+    } else {
+      checkTitleTruncation();
+    }
+    
+    // Recheck on window resize
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(checkTitleTruncation, 100);
     });
 
-    // Infinite scroll (unchanged)
+    // Infinite scroll
     let currentPage = 1;
     let loading = false;
     let hasMore = true;
@@ -105,21 +282,26 @@ permalink: "{% if pagination.pageNumber > 0 %}page/{{ pagination.pageNumber + 1 
           const newPosts = doc.querySelector('#posts-list')?.innerHTML;
           if (newPosts && newPosts.trim()) {
             document.querySelector('#posts-list').insertAdjacentHTML('beforeend', newPosts);
+            // Reattach event listeners for newly loaded posts
+            attachExpandListeners();
+            attachShareListeners();
+            // Check title truncation for new posts
+            checkTitleTruncation();
           } else {
             hasMore = false;
           }
           loading = false;
         })
         .catch(error => {
-          console.error('Error loading posts:', error);
+          console.error('Error loading more posts:', error);
           loading = false;
         });
     }
 
     window.addEventListener('scroll', () => {
-      const scrollPosition = window.innerHeight + window.scrollY;
+      const scrollPos = window.innerHeight + window.scrollY;
       const pageHeight = document.documentElement.scrollHeight;
-      if (scrollPosition >= pageHeight - 300) {
+      if (scrollPos >= pageHeight - 300) {
         loadMorePosts();
       }
     });

@@ -1,0 +1,797 @@
+/* ============================================
+   Color Variables & Theme
+   ============================================ */
+:root {
+  /* Light mode colors - Professional and readable
+     Based on best practices for readability and accessibility */
+  --bg: #ffffff;
+  --text: #212529;  /* Slightly softer than pure black for better readability */
+  --light: #f8f9fa;  /* Card backgrounds */
+  --border: #e0e0e0;  /* Subtle borders */
+  --accent: #2d5016;  /* Forest green accent */
+  --accent-hover: #3d6a1f;
+  --accent-light: rgba(45, 80, 22, 0.1);
+  --accent-light-hover: rgba(45, 80, 22, 0.15);
+}
+
+/* Dark mode color scheme - Professional, accessible, and easy on the eyes
+   Inspired by GitHub, Material Design, and modern web standards
+   Meets WCAG AA contrast requirements (4.5:1 for normal text) */
+:root.dark-mode {
+  --bg: #0d1117;  /* Deep dark blue-gray (GitHub style) - not pure black */
+  --text: #f5f5f5;  /* Off-white for excellent contrast and readability */
+  --light: #161b22;  /* Slightly lighter for cards/elevated surfaces */
+  --border: #30363d;  /* Visible but subtle borders */
+  --accent: #56d364;  /* Bright, accessible green that works in dark mode */
+  --accent-hover: #6ee77f;
+  --accent-light: rgba(86, 211, 100, 0.15);
+  --accent-light-hover: rgba(86, 211, 100, 0.25);
+}
+
+/* Respect system preference as default */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light-mode) {
+    --bg: #0d1117;
+    --text: #f5f5f5;
+    --light: #161b22;
+    --border: #30363d;
+    --accent: #56d364;
+    --accent-hover: #6ee77f;
+    --accent-light: rgba(86, 211, 100, 0.15);
+    --accent-light-hover: rgba(86, 211, 100, 0.25);
+  }
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+body {
+  font-family: "Charter", "Bitstream Charter", "Sitka Text", Cambria, "Noto Serif", "Droid Serif", "Times New Roman", serif;
+  background: var(--bg);
+  color: var(--text);
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem;
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+/* ============================================
+   Site Header
+   ============================================ */
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.site-title {
+  margin: 0;
+}
+
+.site-title a {
+  color: var(--text);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.site-title a:hover {
+  color: var(--accent);
+}
+
+.theme-toggle-btn {
+  padding: 0.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 0.375rem;
+  transition: background 0.15s ease;
+  outline: none;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--light);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+a:hover {
+  text-decoration: none;
+  color: var(--accent);
+  opacity: 0.8;
+}
+
+/* ============================================
+   Individual Post Pages
+   ============================================ */
+.post-page {
+  color: var(--text);
+}
+
+.post-page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 1rem 0;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.post-page-meta {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.post-page-date {
+  font-size: 0.875rem;
+  color: var(--text);
+  opacity: 0.7;
+  font-family: inherit;
+}
+
+.post-page-date:hover {
+  opacity: 1;
+}
+
+.post-page-content {
+  color: var(--text);
+  line-height: 1.7;
+  font-size: 16px;
+}
+
+.post-page-content p {
+  margin-bottom: 1.25rem;
+  line-height: 1.7;
+}
+
+.post-page-content h1,
+.post-page-content h2,
+.post-page-content h3,
+.post-page-content h4,
+.post-page-content h5,
+.post-page-content h6 {
+  color: var(--text);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.post-page-content h1 {
+  font-size: 1.75rem;
+}
+
+.post-page-content h2 {
+  font-size: 1.5rem;
+}
+
+.post-page-content h3 {
+  font-size: 1.25rem;
+}
+
+.post-page-content strong {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.post-page-content a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.post-page-content a:hover {
+  opacity: 0.8;
+}
+
+.post-page-content ul,
+.post-page-content ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+}
+
+.post-page-content li {
+  margin-bottom: 0.5rem;
+  line-height: 1.7;
+}
+
+.post-page-content code {
+  background: var(--light);
+  padding: 0.125rem 0.375rem;
+  border-radius: 3px;
+  font-size: 0.9em;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.post-page-content pre {
+  background: var(--light);
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--border);
+}
+
+.post-page-content pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.post-page-content blockquote {
+  border-left: 4px solid var(--accent);
+  padding-left: 1rem;
+  margin-left: 0;
+  margin-bottom: 1.25rem;
+  color: var(--text);
+  opacity: 0.9;
+  font-style: italic;
+}
+
+.post-page-content img {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 1.25rem;
+  border-radius: 4px;
+}
+
+.post-page-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+/* Theme toggle icon visibility */
+#theme-toggle-moon {
+  display: block;
+}
+
+#theme-toggle-sun {
+  display: none;
+}
+
+:root.dark-mode #theme-toggle-moon {
+  display: none;
+}
+
+:root.dark-mode #theme-toggle-sun {
+  display: block;
+}
+
+#theme-toggle svg {
+  transition: opacity 0.15s ease;
+}
+
+/* ============================================
+   Post Cards
+   ============================================ */
+.post-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.2s ease;
+  box-shadow: none;
+  margin-bottom: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.post-card:hover {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border-color: var(--border);
+  background: var(--light);
+}
+
+.post-card .metadata-section {
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+  border-bottom: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Post title wrapper for truncation */
+.post-card .post-title-wrapper {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.post-card h2.post-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0;
+  letter-spacing: -0.01em;
+  position: relative;
+}
+
+.post-card h2.post-title a {
+  color: var(--text);
+  text-decoration: none;
+  transition: color 0.15s ease;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.post-card h2.post-title a:hover {
+  color: var(--accent);
+}
+
+/* Title tooltip */
+.post-card .title-tooltip {
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  left: 0;
+  padding: 0.375rem 0.625rem;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  white-space: normal;
+  max-width: 300px;
+  min-width: 150px;
+  width: max-content;
+  border-radius: 4px;
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  line-height: 1.4;
+  word-wrap: break-word;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+/* Date link hover */
+.post-card .date-link {
+  transition: color 0.15s ease;
+  text-decoration: none;
+}
+
+.post-card .date-link time {
+  transition: color 0.15s ease;
+}
+
+.post-card .date-link:hover time {
+  color: var(--accent);
+}
+
+/* Content styling */
+/* General article content (for individual post pages) */
+main article,
+main > div {
+  color: var(--text);
+}
+
+main article p,
+main > div p {
+  margin-bottom: 1rem;
+  line-height: 1.7;  /* Slightly more spacing for long-form reading */
+}
+
+main article h1,
+main article h2,
+main article h3,
+main article h4,
+main article h5,
+main article h6 {
+  color: var(--text);
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+main article strong {
+  font-weight: 600;
+  color: var(--text);
+}
+
+main article a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+main article a:hover {
+  opacity: 0.8;
+}
+
+/* Post card content styling */
+.post-card .prose {
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.post-card .prose p {
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.post-card .prose p:last-child {
+  margin-bottom: 0;
+}
+
+.post-card .prose strong {
+  font-weight: 600;
+}
+
+.post-card .prose a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.post-card .prose a:hover {
+  opacity: 0.8;
+}
+
+.post-card .excerpt-content p,
+.post-card .full-content {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* ============================================
+   Interactive Elements
+   ============================================ */
+/* "Show more" link-style button */
+.read-more {
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 15px;
+  font-weight: inherit;
+  font-family: inherit;
+  transition: opacity 0.15s ease;
+  cursor: pointer;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  display: inline;
+  margin-top: 0.5rem;
+  outline: none !important;
+}
+
+.read-more:hover {
+  opacity: 0.8;
+  color: var(--accent);
+}
+
+.read-more:focus {
+  outline: none !important;
+}
+
+/* Share button */
+.share-btn {
+  transition: all 0.15s ease;
+  border-radius: 0.5rem;
+  position: relative;
+  outline: none !important;
+  border: none;
+}
+
+.share-btn:hover {
+  background: var(--light);
+}
+
+.share-btn:focus {
+  outline: none !important;
+}
+
+.share-btn svg {
+  color: #666;
+  transition: color 0.15s ease;
+}
+
+.share-btn:hover .share-icon {
+  color: var(--accent);
+}
+
+/* Copy tooltip */
+.share-btn .copy-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  font-size: 0.6875rem;
+  white-space: nowrap;
+  border-radius: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  pointer-events: none;
+  z-index: 1000;
+  font-family: inherit;
+}
+
+/* Share button feedback */
+.share-btn.copied {
+  background: var(--accent);
+  color: white;
+}
+
+.share-btn.copied svg {
+  color: white;
+}
+
+/* Checkmark icon color */
+.checkmark-icon {
+  color: var(--accent) !important;
+}
+
+/* ============================================
+   Utilities
+   ============================================ */
+.hidden {
+  display: none !important;
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+.full-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   Dark Mode Styles
+   ============================================ */
+:root.dark-mode .post-card {
+  background: var(--light);
+  border-color: var(--border);
+}
+
+:root.dark-mode .share-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+:root.dark-mode .read-more {
+  background: var(--accent-light);
+}
+
+:root.dark-mode .read-more:hover {
+  background: var(--accent-light-hover);
+}
+
+:root.dark-mode .post-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+:root.dark-mode .post-card .prose {
+  color: var(--text);  /* Use theme text color for consistency */
+}
+
+:root.dark-mode .post-card time {
+  color: #c9d1d9;  /* Lighter gray for better readability in dark mode */
+}
+
+:root.dark-mode .share-btn svg {
+  color: #c9d1d9;  /* Lighter gray for better visibility */
+}
+
+:root.dark-mode .post-card .title-tooltip {
+  background: rgba(13, 17, 23, 0.95);  /* Match dark mode background */
+  color: #f5f5f5;  /* Use theme text color for consistency */
+  border: 1px solid rgba(86, 211, 100, 0.3);  /* Use new accent color */
+}
+
+:root.dark-mode .post-card h2.post-title a {
+  color: var(--text);  /* Use theme text color */
+}
+
+:root.dark-mode .post-card h2.post-title a:hover {
+  color: var(--accent);
+}
+
+:root.dark-mode .share-btn .copy-tooltip {
+  background: rgba(13, 17, 23, 0.95);  /* Match dark mode background */
+  color: #f5f5f5;  /* Use theme text color */
+  border: 1px solid rgba(86, 211, 100, 0.3);  /* Use new accent color */
+}
+
+:root.dark-mode .post-card .date-link:hover time {
+  color: var(--accent);
+}
+
+/* System preference dark mode (when no manual selection) */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light-mode) .post-card {
+    background: var(--light);
+    border-color: var(--border);
+  }
+
+  :root:not(.light-mode) .share-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  :root:not(.light-mode) .read-more {
+    background: var(--accent-light);
+  }
+
+  :root:not(.light-mode) .read-more:hover {
+    background: var(--accent-light-hover);
+  }
+
+  :root:not(.light-mode) .post-card:hover {
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+
+  :root:not(.light-mode) .post-card .prose {
+    color: var(--text);  /* Use theme text color for consistency */
+  }
+
+  :root:not(.light-mode) .post-card time {
+    color: #c9d1d9;  /* Lighter gray for better readability in dark mode */
+  }
+
+  :root:not(.light-mode) .share-btn svg {
+    color: #c9d1d9;  /* Lighter gray for better visibility */
+  }
+
+  :root:not(.light-mode) .post-card .title-tooltip {
+    background: rgba(13, 17, 23, 0.95);  /* Match dark mode background */
+    color: #f5f5f5;  /* Use theme text color for consistency */
+    border: 1px solid rgba(86, 211, 100, 0.3);  /* Use new accent color */
+  }
+
+  :root:not(.light-mode) .post-card h2.post-title a {
+    color: var(--text);  /* Use theme text color */
+  }
+
+  :root:not(.light-mode) .post-card h2.post-title a:hover {
+    color: var(--accent);
+  }
+
+  :root:not(.light-mode) .share-btn .copy-tooltip {
+    background: rgba(13, 17, 23, 0.95);  /* Match dark mode background */
+    color: #f5f5f5;  /* Use theme text color */
+    border: 1px solid rgba(86, 211, 100, 0.3);  /* Use new accent color */
+  }
+
+  :root:not(.light-mode) .post-card .date-link:hover time {
+    color: var(--accent);
+  }
+
+  :root:not(.light-mode) #theme-toggle-moon {
+    display: none;
+  }
+
+  :root:not(.light-mode) #theme-toggle-sun {
+    display: block;
+  }
+}
+
+/* ============================================
+   Mobile Responsiveness
+   ============================================ */
+@media (max-width: 640px) {
+  body {
+    padding: 1rem 0.75rem;
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .post-card {
+    padding: 0.875rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .post-card .metadata-section {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-bottom: 0.625rem;
+    margin-bottom: 0.625rem;
+  }
+
+  .post-card .post-title-wrapper {
+    flex-basis: 100%;
+    order: 1;
+  }
+
+  .post-card .metadata-section > div:last-child {
+    order: 2;
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+  .post-card time {
+    font-size: 0.6875rem;
+  }
+
+  .post-card h2.post-title {
+    font-size: 1rem;
+  }
+
+  .post-card .prose p {
+    font-size: 14px;
+    margin-bottom: 0.625rem;
+  }
+
+  .post-card .title-tooltip {
+    max-width: calc(100vw - 2rem);
+    left: auto;
+    right: 0;
+  }
+}
+
+/* ============================================
+   Footer
+   ============================================ */
+.site-footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text);
+  opacity: 0.7;
+  padding: 1.5rem 0 1rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+.site-footer .back-link {
+  margin: 0.5rem 0 0 0;
+}
+
+.site-footer a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.site-footer a:hover {
+  opacity: 0.8;
+}
