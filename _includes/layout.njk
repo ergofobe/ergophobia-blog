@@ -98,13 +98,22 @@
           btn.dataset.shareListenerAttached = 'true';
           
           btn.addEventListener('click', async function() {
-            const url = this.getAttribute('data-url');
+            // If data-use-current-url is set, use the current page's URL
+            // Otherwise, convert the relative URL from data-url to absolute URL
+            let absoluteUrl;
+            if (this.hasAttribute('data-use-current-url')) {
+              absoluteUrl = window.location.href;
+            } else {
+              const urlPath = this.getAttribute('data-url');
+              // Convert relative path to absolute URL using current page's location
+              absoluteUrl = new URL(urlPath, window.location.href).href;
+            }
             const shareIcon = this.querySelector('.share-icon');
             const checkmarkIcon = this.querySelector('.checkmark-icon');
             const tooltip = this.querySelector('.copy-tooltip');
             
             try {
-              await navigator.clipboard.writeText(url);
+              await navigator.clipboard.writeText(absoluteUrl);
 
               // Switch to checkmark icon
               if (shareIcon) shareIcon.style.display = 'none';
@@ -128,7 +137,7 @@
 
             } catch (err) {
               console.error('Copy failed', err);
-              prompt('Copy failed — copy manually:', url);
+              prompt('Copy failed — copy manually:', absoluteUrl);
             }
           });
         });

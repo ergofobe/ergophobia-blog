@@ -41,7 +41,7 @@ permalink: "{% if pagination.pageNumber > 0 %}page/{{ pagination.pageNumber + 1 
             <!-- Fixed share button -->
             <button class="share-btn"
                     style="padding: 0.375rem; border-radius: 0.5rem; border: none; background: transparent; cursor: pointer; transition: all 0.15s ease; flex-shrink: 0; position: relative;"
-                    data-url="{{ post.url | absoluteUrl(site.url) }}"
+                    data-url="{{ post.url | relativeUrl(page.url) }}"
                     aria-label="Copy post link">
               <svg class="share-icon" style="width: 1rem; height: 1rem; color: #666; display: block;"
                    viewBox="0 0 24 24"
@@ -209,13 +209,22 @@ permalink: "{% if pagination.pageNumber > 0 %}page/{{ pagination.pageNumber + 1 
         btn.dataset.shareListenerAttached = 'true';
         
         btn.addEventListener('click', async function() {
-          const url = this.getAttribute('data-url');
+          // If data-use-current-url is set, use the current page's URL
+          // Otherwise, convert the relative URL from data-url to absolute URL
+          let absoluteUrl;
+          if (this.hasAttribute('data-use-current-url')) {
+            absoluteUrl = window.location.href;
+          } else {
+            const urlPath = this.getAttribute('data-url');
+            // Convert relative path to absolute URL using current page's location
+            absoluteUrl = new URL(urlPath, window.location.href).href;
+          }
           const shareIcon = this.querySelector('.share-icon');
           const checkmarkIcon = this.querySelector('.checkmark-icon');
           const tooltip = this.querySelector('.copy-tooltip');
           
           try {
-            await navigator.clipboard.writeText(url);
+            await navigator.clipboard.writeText(absoluteUrl);
 
             // Switch to checkmark icon
             if (shareIcon) shareIcon.style.display = 'none';
@@ -239,7 +248,7 @@ permalink: "{% if pagination.pageNumber > 0 %}page/{{ pagination.pageNumber + 1 
 
           } catch (err) {
             console.error('Copy failed', err);
-            prompt('Copy failed — copy manually:', url);
+            prompt('Copy failed — copy manually:', absoluteUrl);
           }
         });
       });
