@@ -70,7 +70,7 @@ Feel free to fork it, audit it, improve it, or just read the code as an example 
 
 The XRP Ledger is fast and cheap, but little things like the reserve can add up when you're cleaning house. A simple tool like this makes the process less annoying without needing to rely on third-party apps.
 
-If you try it, spot a bug, or want to add features (dry-run mode, batch support, etc.), hit me up on X at @ergophobe.
+If you try it, spot a bug, or want to add features (dry-run mode, batch support, etc.), hit me up on X at [@ergophobe](https://x.com/ergophobe).
 
 Happy sweeping — and may your old reserves find peace.
 
