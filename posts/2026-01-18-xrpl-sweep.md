@@ -13,8 +13,6 @@ tags:
 layout: article.njk
 ---
 
-# Sweeping XRP with a Simple Node.js Tool – Recover Your Reserve in Minutes
-
 If you've ever held XRP on the XRP Ledger, you know about the account reserve — currently 1 XRP that stays locked forever to keep your address active and prevent spam. That 1 XRP is often the last piece left when you're trying to consolidate or migrate wallets.
 
 Recovering that reserve has always been a bit manual, but it doesn't have to be a hassle. I created a small, secure Node.js command-line tool called xrpl-sweep that handles the entire process in one straightforward session:
