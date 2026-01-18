@@ -62,7 +62,7 @@ The script has easy testnet support. Change one line to TESTNET = true, fund a t
 
 ## Open Source & MIT Licensed
 
-The full project lives on GitHub at https://github.com/ergofobe/xrpl-sweep
+The full project lives on GitHub at [ergofobe/xrpl-sweep](https://github.com/ergofobe/xrpl-sweep).
 
 Feel free to fork it, audit it, improve it, or just read the code as an example of using the xrpl.js library.
 
