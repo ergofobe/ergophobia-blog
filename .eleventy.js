@@ -1,8 +1,5 @@
 // .eleventy.js
 import { DateTime } from 'luxon';
-import matter from 'gray-matter';
-import fs from 'fs';
-import { glob } from 'glob';
 
 export default function (eleventyConfig) {
   // === URL Helpers ===
@@ -234,46 +231,6 @@ export default function (eleventyConfig) {
     
     return null;
   }
-
-  // Preprocess markdown files to normalize dates in front matter
-  // This runs before Eleventy processes the files
-  eleventyConfig.on("eleventy.before", async function() {
-    // Find all markdown files in the posts directory
-    const postFiles = await glob('./posts/**/*.md');
-    
-    for (const filePath of postFiles) {
-      try {
-        // Read the file
-        const fileContent = fs.readFileSync(filePath, 'utf8');
-        
-        // Parse front matter
-        const parsed = matter(fileContent);
-        
-        // If there's a date field, normalize it
-        if (parsed.data && parsed.data.date && typeof parsed.data.date === 'string') {
-          const normalized = normalizeDate(parsed.data.date);
-          if (normalized) {
-            // Reconstruct the file with normalized date
-            // Format the date as ISO string for Eleventy compatibility
-            const dt = DateTime.fromJSDate(normalized);
-            // Use ISO format which Eleventy handles well
-            const formattedDate = dt.toISO();
-            
-            // Update the front matter - Eleventy will parse ISO strings correctly
-            parsed.data.date = formattedDate;
-            
-            // Reconstruct the file content
-            const newContent = matter.stringify(parsed.content, parsed.data);
-            
-            // Write back to file
-            fs.writeFileSync(filePath, newContent, 'utf8');
-          }
-        }
-      } catch (error) {
-        console.warn(`Warning: Could not normalize date in ${filePath}:`, error.message);
-      }
-    }
-  });
 
   // === Date Formatting with Luxon ===
   eleventyConfig.addFilter("formatDate", function (dateInput, format = "MMMM d, yyyy") {
