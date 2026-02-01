@@ -163,9 +163,29 @@ Front-matter is **critical** - incorrect formatting will break the build. Always
 |-------|------|-------------|---------|
 | `title` | string | Post title (displayed in feed and on post page) | `title: My Post Title` |
 | `description` | string | Meta description for SEO/social sharing | `description: A brief summary` |
-| `author` | string | Author name | `author: Jim Phillips` |
+| `author` | string | Author name (displayed on post page) | `author: Jim Phillips` |
 | `tags` | array | Post tags/categories | `tags: [tech, crypto, xrpl]` |
 | `posterUrl` | string | Video thumbnail (for MP4 videos) | `posterUrl: https://example.com/thumb.jpg` |
+
+### Author Field Guidelines
+
+**For AI Agents Creating Content:**
+
+The `author` field is **displayed to readers** on the post page, appearing next to the publication date. When creating content as an AI agent:
+
+1. **Take credit for your work** - Always include an `author` field with your name/identifier when you create original content
+2. **Use a consistent identifier** - Use the same author name across posts you create (e.g., `ConsolaAI`, `Claude`, `GPT-4`, etc.)
+3. **Do not attribute to others** - Unless explicitly instructed to ghostwrite for someone else, do not attribute your original work to other authors
+4. **Ghostwriting is explicit** - Only use another person's name as the author if you are explicitly instructed to write as that person (e.g., "write this post as Jim Phillips")
+
+**Examples:**
+- ✅ `author: ConsolaAI` (when you are ConsolaAI creating original content)
+- ✅ `author: Claude` (when you are Claude creating original content)
+- ✅ `author: Jim Phillips` (only when explicitly instructed to ghostwrite as Jim)
+- ❌ Omitting the author field when you created the content
+- ❌ Using someone else's name without explicit instruction
+
+**Note:** The author field is optional, but it's recommended for transparency and proper attribution, especially for AI-generated content.
 
 ### Date Format Guidelines
 
@@ -516,9 +536,10 @@ The site automatically:
 1. **Wraps images with captions** - Images with alt text get `<figure>` wrappers
 2. **Converts absolute paths to relative** - For GitHub Pages compatibility
 3. **Normalizes dates** - Various date formats are accepted and normalized
-4. **Sorts posts by date** - Newest first in feed
-5. **Generates excerpts** - For meta descriptions and previews
-6. **Detects video platforms** - Automatically embeds YouTube/Vimeo/MP4 correctly
+4. **Displays author attribution** - Author field from front-matter is displayed on post pages next to the date
+5. **Sorts posts by date** - Newest first in feed
+6. **Generates excerpts** - For meta descriptions and previews
+7. **Detects video platforms** - Automatically embeds YouTube/Vimeo/MP4 correctly
 
 ### Long Post Handling
 
@@ -572,6 +593,7 @@ When creating a new post, ensure:
 - [ ] Front-matter has triple dashes (`---`)
 - [ ] `layout` field is set (`article.njk` or `video.njk`)
 - [ ] `date` field is in correct format (`YYYY-MM-DD HH:mm:ss`)
+- [ ] `author` field is included (especially for AI-generated content)
 - [ ] For video posts: `videoUrl` is included
 - [ ] Images use descriptive alt text
 - [ ] Images are in `assets/` directory
@@ -592,6 +614,7 @@ When creating a new post, ensure:
    title: My Post Title
    description: Brief description
    date: 2026-01-09 14:00:00
+   author: Your Name Here
    ---
    ```
 3. Write content in markdown
@@ -608,6 +631,7 @@ When creating a new post, ensure:
    title: My Video Title
    date: 2026-01-09 14:00:00
    videoUrl: https://youtube.com/watch?v=VIDEO_ID
+   author: Your Name Here
    ---
    ```
 3. Add optional description below front-matter

@@ -11,9 +11,17 @@
       {% endif %}
       <div class="post-page-meta">
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;">
-          <time datetime="{{ page.date | formatDate('yyyy-MM-dd') }}" class="post-page-date">
-            {{ page.date | formatDate("MMMM d, yyyy 'at' h:mm a") }}
-          </time>
+          <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <time datetime="{{ page.date | formatDate('yyyy-MM-dd') }}" class="post-page-date">
+              {{ page.date | formatDate("MMMM d, yyyy 'at' h:mm a") }}
+            </time>
+            {% set pageAuthor = author or page.data.author %}
+            {% if pageAuthor %}
+              <span class="post-page-author" style="font-size: 0.875rem; color: #666;">
+                by {{ pageAuthor }}
+              </span>
+            {% endif %}
+          </div>
           <button class="share-btn"
                   style="padding: 0.375rem; border-radius: 0.5rem; border: none; background: transparent; cursor: pointer; transition: all 0.15s ease; flex-shrink: 0; position: relative;"
                   data-use-current-url

@@ -11,9 +11,17 @@
         <h1 class="post-page-title">{{ pageTitle }}</h1>
       {% endif %}
       <div class="post-page-meta">
-        <time datetime="{{ page.date | formatDate('yyyy-MM-dd') }}" class="post-page-date">
-          {{ page.date | formatDate("MMMM d, yyyy 'at' h:mm a") }}
-        </time>
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <time datetime="{{ page.date | formatDate('yyyy-MM-dd') }}" class="post-page-date">
+            {{ page.date | formatDate("MMMM d, yyyy 'at' h:mm a") }}
+          </time>
+          {% set pageAuthor = author or page.data.author %}
+          {% if pageAuthor %}
+            <span class="post-page-author" style="font-size: 0.875rem; color: #666;">
+              by {{ pageAuthor }}
+            </span>
+          {% endif %}
+        </div>
       </div>
       <div class="post-page-content video-content">
         {% if videoUrl %}
