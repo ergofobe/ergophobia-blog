@@ -1,5 +1,8 @@
 // .eleventy.js
 import { DateTime } from 'luxon';
+import matter from 'gray-matter';
+import fs from 'fs';
+import { glob } from 'glob';
 
 export default function (eleventyConfig) {
   // === URL Helpers ===
@@ -128,6 +131,150 @@ export default function (eleventyConfig) {
     return excerpt.length < cleaned.length;
   });
 
+  // === Date Parsing and Normalization ===
+  // Normalize date strings from various formats to a standard Date object
+  function normalizeDate(dateInput) {
+    if (!dateInput) return null;
+    
+    // If it's already a Date object, return it
+    if (dateInput instanceof Date) {
+      return dateInput;
+    }
+    
+    // If it's a number (timestamp), convert it
+    if (typeof dateInput === "number") {
+      return new Date(dateInput);
+    }
+    
+    // If it's a string, try to parse it with Luxon's flexible parsing
+    if (typeof dateInput === "string") {
+      const dateStr = dateInput.trim();
+      
+      // Map common timezone abbreviations to IANA timezone names
+      const timezoneMap = {
+        'EST': 'America/New_York',
+        'EDT': 'America/New_York',
+        'CST': 'America/Chicago',
+        'CDT': 'America/Chicago',
+        'MST': 'America/Denver',
+        'MDT': 'America/Denver',
+        'PST': 'America/Los_Angeles',
+        'PDT': 'America/Los_Angeles',
+        'UTC': 'UTC',
+        'GMT': 'GMT'
+      };
+      
+      // Try to extract timezone abbreviation and replace with IANA name
+      let normalizedStr = dateStr;
+      let timezone = null;
+      for (const [abbr, iana] of Object.entries(timezoneMap)) {
+        if (dateStr.endsWith(' ' + abbr)) {
+          normalizedStr = dateStr.replace(' ' + abbr, '').trim();
+          timezone = iana;
+          break;
+        }
+      }
+      
+      // Try various date formats that AI might generate
+      const formats = [
+        // Standard formats
+        "yyyy-MM-dd HH:mm:ss",
+        "yyyy-MM-dd HH:mm",
+        "yyyy-MM-dd",
+        // With timezone offsets (ISO format)
+        "yyyy-MM-dd HH:mm Z",
+        "yyyy-MM-dd HH:mm:ss Z",
+        "yyyy-MM-dd HH:mm ZZZ",
+        "yyyy-MM-dd HH:mm:ss ZZZ",
+        // ISO formats
+        "yyyy-MM-dd'T'HH:mm:ss",
+        "yyyy-MM-dd'T'HH:mm:ss.SSS",
+        "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
+        "yyyy-MM-dd'T'HH:mm:ssZ",
+        // More flexible formats
+        "MMM dd, yyyy HH:mm",
+        "MMM dd, yyyy HH:mm:ss",
+        "MMMM dd, yyyy HH:mm",
+        "MMMM dd, yyyy HH:mm:ss",
+      ];
+      
+      // Try parsing with each format (with timezone if we found one)
+      for (const format of formats) {
+        let dt;
+        if (timezone) {
+          dt = DateTime.fromFormat(normalizedStr, format, { zone: timezone });
+        } else {
+          dt = DateTime.fromFormat(normalizedStr, format);
+        }
+        if (dt.isValid) {
+          return dt.toJSDate();
+        }
+      }
+      
+      // Try parsing the original string with timezone if we found one
+      if (timezone) {
+        const dtWithTz = DateTime.fromFormat(normalizedStr, "yyyy-MM-dd HH:mm", { zone: timezone });
+        if (dtWithTz.isValid) {
+          return dtWithTz.toJSDate();
+        }
+      }
+      
+      // Try Luxon's fromString which is very flexible
+      const dtFlexible = DateTime.fromString(dateStr);
+      if (dtFlexible.isValid) {
+        return dtFlexible.toJSDate();
+      }
+      
+      // Fallback to JavaScript's Date constructor
+      const jsDate = new Date(dateStr);
+      if (!isNaN(jsDate.getTime())) {
+        return jsDate;
+      }
+    }
+    
+    return null;
+  }
+
+  // Preprocess markdown files to normalize dates in front matter
+  // This runs before Eleventy processes the files
+  eleventyConfig.on("eleventy.before", async function() {
+    // Find all markdown files in the posts directory
+    const postFiles = await glob('./posts/**/*.md');
+    
+    for (const filePath of postFiles) {
+      try {
+        // Read the file
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+        
+        // Parse front matter
+        const parsed = matter(fileContent);
+        
+        // If there's a date field, normalize it
+        if (parsed.data && parsed.data.date && typeof parsed.data.date === 'string') {
+          const normalized = normalizeDate(parsed.data.date);
+          if (normalized) {
+            // Reconstruct the file with normalized date
+            // Format the date as ISO string for Eleventy compatibility
+            const dt = DateTime.fromJSDate(normalized);
+            // Use ISO format which Eleventy handles well
+            const formattedDate = dt.toISO();
+            
+            // Update the front matter - Eleventy will parse ISO strings correctly
+            parsed.data.date = formattedDate;
+            
+            // Reconstruct the file content
+            const newContent = matter.stringify(parsed.content, parsed.data);
+            
+            // Write back to file
+            fs.writeFileSync(filePath, newContent, 'utf8');
+          }
+        }
+      } catch (error) {
+        console.warn(`Warning: Could not normalize date in ${filePath}:`, error.message);
+      }
+    }
+  });
+
   // === Date Formatting with Luxon ===
   eleventyConfig.addFilter("formatDate", function (dateInput, format = "MMMM d, yyyy") {
     let dt;
@@ -136,7 +283,13 @@ export default function (eleventyConfig) {
     } else if (dateInput instanceof Date) {
       dt = DateTime.fromJSDate(dateInput);
     } else if (typeof dateInput === "string" || typeof dateInput === "number") {
-      dt = DateTime.fromJSDate(new Date(dateInput));
+      // Try to normalize the date first
+      const normalized = normalizeDate(dateInput);
+      if (normalized) {
+        dt = DateTime.fromJSDate(normalized);
+      } else {
+        dt = DateTime.fromJSDate(new Date(dateInput));
+      }
     } else {
       dt = DateTime.now();
     }
@@ -238,9 +391,25 @@ export default function (eleventyConfig) {
 
   // === Collections ===
   eleventyConfig.addCollection("posts", function (collectionApi) {
-    return collectionApi
+    const posts = collectionApi
       .getFilteredByGlob("./posts/**/*.{md,markdown}")
-      .sort((a, b) => b.date - a.date);
+      .map(post => {
+        // Normalize the date if it exists
+        if (post.data && post.data.date) {
+          const normalized = normalizeDate(post.data.date);
+          if (normalized) {
+            post.data.date = normalized;
+            post.date = normalized; // Also update the page date
+          }
+        }
+        return post;
+      });
+    
+    return posts.sort((a, b) => {
+      const dateA = a.date || a.data?.date || new Date(0);
+      const dateB = b.date || b.data?.date || new Date(0);
+      return dateB - dateA;
+    });
   });
 
   // === Transform: Add captions to images ===
