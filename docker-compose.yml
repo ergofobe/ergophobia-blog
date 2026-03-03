@@ -1,0 +1,20 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    container_name: ergophobia-blog
+
+  # Development mode with live reload
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+      - /app/node_modules  # Prevent host node_modules from overwriting container
+    container_name: ergophobia-blog-dev
+    profiles:
+      - dev

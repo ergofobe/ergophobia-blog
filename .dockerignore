@@ -1,0 +1,27 @@
+# Build output (rebuilt in container)
+_site/
+.tmp/
+.cache/
+
+# Dependencies (installed in container)
+node_modules/
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Editor & OS
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/
+
+# Logs
+*.log
