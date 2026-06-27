@@ -67,8 +67,11 @@ img{max-width:100%;height:auto}
 /* ===== Home two-column layout ===== */
 .home-cols{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
 .home-col{min-width:0}
-.home-col .row{grid-template-columns:96px 1fr auto;gap:14px}
-@media(max-width:760px){.home-cols{grid-template-columns:1fr;gap:0}.home-col .row{grid-template-columns:118px 1fr auto;gap:18px}}
+.home-col .row{grid-template-columns:1fr auto;grid-template-areas:"meta pill" "body body";align-items:center;gap:10px 14px}
+.home-col .row>div{grid-area:body;min-width:0}
+.home-col .row .date,.home-col .row .status{grid-area:meta}
+.home-col .row .pill{grid-area:pill;justify-self:end}
+@media(max-width:760px){.home-cols{grid-template-columns:1fr;gap:0}}
 
 /* ===== Rows (posts + projects) ===== */
 .row{display:grid;grid-template-columns:118px 1fr auto;gap:18px;align-items:center;
