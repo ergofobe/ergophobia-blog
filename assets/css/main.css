@@ -114,3 +114,7 @@ img{max-width:100%;height:auto}
 /* ===== Pagefind ===== */
 :root{--pagefind-ui-primary:var(--accent);--pagefind-ui-background:var(--panel);
   --pagefind-ui-text:var(--ink);--pagefind-ui-border:var(--line);--pagefind-ui-font:var(--font-sans)}
+
+/* ===== Projects Row Title Links ===== */
+.row h3 a{color:inherit;text-decoration:none}
+.row:hover h3 a{color:var(--accent)}
