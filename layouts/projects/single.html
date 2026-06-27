@@ -7,6 +7,17 @@
     {{ with .Params.demo }} &nbsp;·&nbsp; <a href="{{ . }}" target="_blank" rel="noopener">↗ demo</a>{{ end }}
   </div>
   <div class="prose" data-pagefind-body>{{ .Content }}</div>
+  {{ $slug := .File.ContentBaseName }}
+  {{ $updates := where (where .Site.RegularPages "Section" "updates") "Params.project" $slug }}
+  {{ with $updates }}
+  <div class="sec-label" style="margin-top:2rem">work log <a href="/updates/">all updates →</a></div>
+  {{ range .ByDate.Reverse }}
+  <a class="row" href="{{ .RelPermalink }}">
+    <span class="date">{{ .Date.Format "2006-01-02" }}</span>
+    <div><h3>{{ .Title }}</h3><p>{{ .Description }}</p></div>
+  </a>
+  {{ end }}
+  {{ end }}
   {{ with .Params.tags }}<div class="tags">{{ range . }}<a href="/tags/{{ . | urlize }}/">#{{ . }}</a>{{ end }}</div>{{ end }}
 </article>
 {{ end }}

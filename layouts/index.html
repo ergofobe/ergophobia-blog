@@ -10,6 +10,6 @@
   {{ range first 5 (where .Site.RegularPages "Section" "posts") }}{{ partial "post-row.html" . }}{{ end }}
 
   <div class="sec-label">projects <a href="/projects/">all projects →</a></div>
-  {{ range first 3 (sort (where .Site.RegularPages "Section" "projects") "Weight") }}{{ partial "project-row.html" . }}{{ end }}
+  {{ range first 3 (where .Site.RegularPages "Section" "projects").ByDate.Reverse }}{{ partial "project-row.html" . }}{{ end }}
 </div>
 {{ end }}
