@@ -1,0 +1,30 @@
+baseURL = "https://ergophobia.org/"
+title = "Ergophobia"
+enableRobotsTXT = true
+summaryLength = 40
+timeZone = "America/New_York"
+
+[pagination]
+  pagerSize = 12
+
+[taxonomies]
+  tag = "tags"
+
+[markup]
+  [markup.goldmark.renderer]
+    unsafe = true
+  [markup.highlight]
+    noClasses = false
+    lineNos = false
+
+[outputs]
+  home = ["HTML", "RSS"]
+
+[params]
+  description = "A quiet corner of the internet — thoughts without the algorithm, and the projects I'm building."
+  tagline = "high-tech redneck · thoughts & projects"
+  author = "Jim"
+  [params.search]
+    enabled = true
+  [params.analytics]
+    cloudflare_token = ""   # set to the Cloudflare Web Analytics token to enable the beacon

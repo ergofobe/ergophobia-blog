@@ -1,0 +1,16 @@
+{{ define "main" }}
+<div class="wrap">
+  <h1 class="sec-label">~/ergophobia $ ls projects/</h1>
+  {{ range sort .Pages "Weight" }}
+  <div class="row">
+    {{ $s := .Params.status | default "active" }}
+    <span class="status"><span class="led {{ if eq $s "wip" }}amber{{ else if eq $s "archived" }}muted{{ end }}"></span>{{ $s }}</span>
+    <div><h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3><p>{{ .Params.summary }}</p></div>
+    <span class="status" style="gap:14px">
+      {{ with .Params.repo }}<a href="{{ . }}" target="_blank" rel="noopener">↗repo</a>{{ end }}
+      {{ with .Params.demo }}&nbsp;<a href="{{ . }}" target="_blank" rel="noopener">↗demo</a>{{ end }}
+    </span>
+  </div>
+  {{ end }}
+</div>
+{{ end }}

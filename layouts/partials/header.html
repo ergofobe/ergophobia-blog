@@ -1,0 +1,10 @@
+<header class="site-header"><div class="wrap">
+  <a class="brand" href="/"><span class="c">~/</span><span class="p">ergophobia</span></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="/posts/" {{ if hasPrefix .RelPermalink "/posts" }}aria-current="page"{{ end }}>posts</a>
+    <a href="/projects/" {{ if hasPrefix .RelPermalink "/projects" }}aria-current="page"{{ end }}>projects</a>
+    <a href="/about/" {{ if eq .RelPermalink "/about/" }}aria-current="page"{{ end }}>about</a>
+    {{ if .Site.Params.search.enabled }}<a href="/search/">./search</a>{{ end }}
+    {{ partial "theme-toggle.html" . }}
+  </nav>
+</div></header>

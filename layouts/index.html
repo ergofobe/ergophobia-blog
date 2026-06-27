@@ -1,0 +1,15 @@
+{{ define "main" }}
+<section class="wrap hero">
+  <div class="promptline"><span class="g">{{ index (split .Params.hero_prompt ":") 0 }}</span>:{{ index (split .Params.hero_prompt ":") 1 }}</div>
+  <h1>{{ .Params.hero_line | replaceRE `\[(.+?)\]` `<span class="hl">$1</span>` | safeHTML }}<span class="cursor"></span></h1>
+  <p>{{ .Params.hero_sub }}</p>
+</section>
+
+<div class="wrap">
+  <div class="sec-label">recent posts <a href="/posts/">all posts →</a></div>
+  {{ range first 5 (where .Site.RegularPages "Section" "posts") }}{{ partial "post-row.html" . }}{{ end }}
+
+  <div class="sec-label">projects <a href="/projects/">all projects →</a></div>
+  {{ range first 3 (sort (where .Site.RegularPages "Section" "projects") "Weight") }}{{ partial "project-row.html" . }}{{ end }}
+</div>
+{{ end }}

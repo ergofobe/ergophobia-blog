@@ -1,22 +1,14 @@
 {
   "name": "ergophobia-blog",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "build": "npx @11ty/eleventy",
-    "start": "npx @11ty/eleventy --serve --quiet",
-    "watch": "npx @11ty/eleventy --watch --quiet",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "private": true,
   "type": "module",
+  "scripts": {
+    "dev": "hugo server -D --navigateToChanged",
+    "build": "sh scripts/cf-build.sh",
+    "check": "node scripts/check-content.mjs content",
+    "test": "node --test"
+  },
   "devDependencies": {
-    "@11ty/eleventy": "^3.1.2",
-    "glob": "^13.0.0",
-    "gray-matter": "^4.0.3",
-    "luxon": "^3.7.2"
+    "pagefind": "^1.1.0"
   }
 }

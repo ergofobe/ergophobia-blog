@@ -1,0 +1,5 @@
+<a class="row" href="{{ .RelPermalink }}">
+  <span class="date">{{ .Date.Format "2006-01-02" }}</span>
+  <div><h3>{{ .Title }}</h3><p>{{ with .Description }}{{ . }}{{ else }}{{ .Summary | plainify | truncate 120 }}{{ end }}</p></div>
+  {{ with index .Params.tags 0 }}<span class="pill">#{{ . }}</span>{{ end }}
+</a>
