@@ -1,0 +1,9 @@
+{{ define "main" }}
+<article class="wrap reading article">
+  {{ with index .Params.tags 0 }}<div class="kicker">{{ . }}</div>{{ end }}
+  <h1>{{ .Title }}</h1>
+  <div class="byline">{{ .Date.Format "January 2, 2006" }} · {{ .ReadingTime }} min · {{ .Site.Params.author }}</div>
+  <div class="prose" data-pagefind-body>{{ .Content }}</div>
+  {{ with .Params.tags }}<div class="tags">{{ range . }}<a href="/tags/{{ . | urlize }}/">#{{ . }}</a>{{ end }}</div>{{ end }}
+</article>
+{{ end }}

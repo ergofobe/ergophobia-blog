@@ -1,8 +1,8 @@
 ---
-layout: article.njk
-title: Welcome to Ergophobia
-description: A quiet corner of the internet for thoughts without the noise of social media
-date: 2026-01-09 21:50:00
+title: "Welcome to Ergophobia"
+date: 2026-01-09T21:50:00
+description: "A quiet corner of the internet for thoughts without the noise of social media."
+tags: [meta]
 ---
 
 Hello and welcome!
@@ -15,7 +15,7 @@ So I built this place: **Ergophobia**.
 
 A small, calm corner of the internet that belongs entirely to me. No character limits, no shadow-bans, no third-party moderation, no one else deciding what stays visible. Just me, my thoughts, and however many words it takes to say them.
 
-![A peaceful, minimalist writing workspace with natural light, a simple desk, tea, and a laptop—evoking calm focus](/assets/peaceful-workspace.webp)
+![A peaceful, minimalist writing workspace with natural light, a simple desk, tea, and a laptop—evoking calm focus](/img/peaceful-workspace.webp)
 
 That’s the feeling I’m after.
 

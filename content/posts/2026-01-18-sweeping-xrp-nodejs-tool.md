@@ -1,16 +1,8 @@
 ---
-title: Sweeping XRP with a Simple Node.js Tool – Recover Your Reserve in Minutes
-description: A secure CLI tool to sweep XRP from any BIP-39 mnemonic wallet and reclaim most of the 1 XRP account reserve using AccountDelete.
-date: 2026-01-18 18:43:00
-author: Jim Phillips
-tags:
-  - xrpl
-  - xrp
-  - cryptocurrency
-  - node.js
-  - wallet-recovery
-  - bip39
-layout: article.njk
+title: "Sweeping XRP with a Simple Node.js Tool – Recover Your Reserve in Minutes"
+date: 2026-01-18T18:43:00
+description: "A secure CLI tool to sweep XRP from any BIP-39 mnemonic wallet and reclaim most of the 1 XRP account reserve using AccountDelete."
+tags: [project, xrp, cli]
 ---
 
 If you've ever held XRP on the XRP Ledger, you know about the account reserve — currently 1 XRP that stays locked forever to keep your address active and prevent spam. That 1 XRP is often the last piece left when you're trying to consolidate or migrate wallets.
