@@ -1,6 +1,6 @@
 {{ define "main" }}
 <div class="wrap">
-  <div class="sec-label">{{ .Title | lower }}</div>
+  <h1 class="sec-label">{{ .Title | lower }}</h1>
   {{ $pages := .Paginate (.Pages.ByDate.Reverse) }}
   {{ range $pages.Pages }}{{ partial "post-row.html" . }}{{ end }}
   {{ template "_internal/pagination.html" . }}
