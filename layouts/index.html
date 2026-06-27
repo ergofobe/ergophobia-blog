@@ -13,7 +13,7 @@
 
   <div class="home-col">
     <div class="sec-label">projects <a href="/projects/">all projects →</a></div>
-    {{ range first 3 (sort (where .Site.RegularPages "Section" "projects") "Weight") }}{{ partial "project-row.html" . }}{{ end }}
+    {{ range first 3 (where .Site.RegularPages "Section" "projects").ByDate.Reverse }}{{ partial "project-row.html" . }}{{ end }}
   </div>
 </div>
 {{ end }}
