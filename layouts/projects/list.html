@@ -1,7 +1,7 @@
 {{ define "main" }}
 <div class="wrap">
   <h1 class="sec-label">~/ergophobia $ ls projects/</h1>
-  {{ range sort .Pages "Weight" }}
+  {{ range .Pages.ByDate.Reverse }}
   <div class="row">
     {{ $s := .Params.status | default "active" }}
     <span class="status"><span class="led {{ if eq $s "wip" }}amber{{ else if eq $s "archived" }}muted{{ end }}"></span>{{ $s }}</span>
