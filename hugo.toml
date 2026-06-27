@@ -1,5 +1,4 @@
 baseURL = "https://ergophobia.org/"
-languageCode = "en-us"
 title = "Ergophobia"
 enableRobotsTXT = true
 summaryLength = 40
