@@ -1354,14 +1354,16 @@ Dark is the default; the header toggle cycles dark → light → system.
 
 ## Deploy (Cloudflare Workers Builds)
 
-1. In the Cloudflare dashboard: **Workers & Pages → Create → Workers → Connect to Git**,
-   select `ergofobe/ergophobia-blog`.
-2. Build command: `npm run build`. Deploy command: leave default (Workers Builds serves
-   `./public` per `wrangler.jsonc`).
-3. After the first successful build, add the custom domain **ergophobia.org** under the
-   Worker's **Settings → Domains & Routes**. Cloudflare provisions the DNS record.
-4. Remove the old GitHub Pages configuration (Settings → Pages → None) so DNS no longer
-   points there.
+The Worker is already connected to `ergofobe/ergophobia-blog` and `ergophobia.org`
+points at it (the GitHub Pages cutover is done). Pushing to `main` triggers a build
+and deploy; non-`main` branches get a preview URL (`preview_urls: true` in
+`wrangler.jsonc`) — verify the redesign on the PR's preview URL before merging.
+
+- **Build command:** `npm run build` (runs `hugo --gc --minify` + Pagefind → `./public`).
+  This branch redefines `build` in `package.json`, so the same command builds the new
+  Hugo site once merged — no Workers Build config change is needed.
+- **Served output:** `./public`, per `wrangler.jsonc` (`html_handling: auto-trailing-slash`,
+  `not_found_handling: 404-page`).
 
 ### Analytics
 
@@ -1389,5 +1391,5 @@ git commit -m "feat: about page, favicon/OG assets, README with cutover docs"
 ## Self-Review Notes
 
 - **Spec coverage:** Hugo stack + Workers deploy (T1,T10), terminal theme tokens dark+light (T2), self-hosted fonts (T2), whoami hero (T3), posts model + migration (T4), projects content type + listing + seeds (T5), video shortcode (T6), Pagefind (T7), RSS/404/robots (T8), Cloudflare analytics (T9), content checks + CI (T10), about/README/cutover + cleanup of Eleventy/Docker/Pages (T1,T11). All spec sections map to a task.
-- **Cutover** (custom domain, DNS off GitHub Pages) is a documented manual dashboard step (T11 README) — Jim performs it; it can't be scripted from the repo.
+- **Cutover** is already complete: Jim connected the Worker to the GitHub repo and switched `ergophobia.org` to it (serving the Eleventy build until this redesign merges). T11 README documents the live state and the "verify on PR preview URL, then merge" flow rather than instructing a fresh cutover.
 - **OG PNG generation** (T11 S3) may require a manual fallback if `sharp-cli` is unavailable in the environment; the step states this explicitly rather than leaving it implicit.
