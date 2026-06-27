@@ -64,6 +64,12 @@ img{max-width:100%;height:auto}
 .sec-label::after{content:"";flex:1;height:1px;background:var(--line)}
 .sec-label a{margin-left:auto;letter-spacing:normal;text-transform:none;font-size:13px}
 
+/* ===== Home two-column layout ===== */
+.home-cols{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+.home-col{min-width:0}
+.home-col .row{grid-template-columns:96px 1fr auto;gap:14px}
+@media(max-width:760px){.home-cols{grid-template-columns:1fr;gap:0}.home-col .row{grid-template-columns:118px 1fr auto;gap:18px}}
+
 /* ===== Rows (posts + projects) ===== */
 .row{display:grid;grid-template-columns:118px 1fr auto;gap:18px;align-items:center;
   padding:16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);

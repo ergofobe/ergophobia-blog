@@ -5,11 +5,15 @@
   <p>{{ .Params.hero_sub }}</p>
 </section>
 
-<div class="wrap">
-  <div class="sec-label">recent posts <a href="/posts/">all posts →</a></div>
-  {{ range first 5 (where .Site.RegularPages "Section" "posts") }}{{ partial "post-row.html" . }}{{ end }}
+<div class="wrap home-cols">
+  <div class="home-col">
+    <div class="sec-label">recent posts <a href="/posts/">all posts →</a></div>
+    {{ range first 5 (where .Site.RegularPages "Section" "posts") }}{{ partial "post-row.html" . }}{{ end }}
+  </div>
 
-  <div class="sec-label">projects <a href="/projects/">all projects →</a></div>
-  {{ range first 3 (where .Site.RegularPages "Section" "projects").ByDate.Reverse }}{{ partial "project-row.html" . }}{{ end }}
+  <div class="home-col">
+    <div class="sec-label">projects <a href="/projects/">all projects →</a></div>
+    {{ range first 3 (where .Site.RegularPages "Section" "projects").ByDate.Reverse }}{{ partial "project-row.html" . }}{{ end }}
+  </div>
 </div>
 {{ end }}
