@@ -1,0 +1,10 @@
+{
+  "name": "ergophobia",
+  "compatibility_date": "2026-06-27",
+  "preview_urls": true,
+  "assets": {
+    "directory": "./public",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}
