@@ -48,3 +48,13 @@ test("project with non-URL repo is an error", () => {
   assert.match(errors[0], /repo/);
   rmSync(root, { recursive: true, force: true });
 });
+
+test("valid project with YAML-quoted scalar values produces no errors", () => {
+  const root = scaffold({
+    "projects/p.md":
+      '---\ntitle: p\nsummary: s\nstatus: "active"\nrepo: "https://example.com"\nweight: 1\n---\nb',
+  });
+  const { errors } = validate(root);
+  assert.deepEqual(errors, []);
+  rmSync(root, { recursive: true, force: true });
+});
