@@ -3,7 +3,7 @@
   <div class="kicker">project · {{ .Params.status | default "active" }}</div>
   <h1>{{ .Title }}</h1>
   <div class="byline">
-    {{ with .Params.repo }}<a href="{{ . }}" target="_blank" rel="noopener">↗ repo</a>{{ end }}
+    {{ if and .Params.repo (not .Params.repo_private) }}<a href="{{ .Params.repo }}" target="_blank" rel="noopener">↗ repo</a>{{ end }}
     {{ with .Params.demo }} &nbsp;·&nbsp; <a href="{{ . }}" target="_blank" rel="noopener">↗ demo</a>{{ end }}
   </div>
   <div class="prose" data-pagefind-body>{{ .Content }}</div>

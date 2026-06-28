@@ -4,6 +4,7 @@ date: 2026-06-24
 summary: "A daily code-breaking puzzle on Cloudflare Workers — guess the hidden color code, get peg-style feedback, build a streak."
 status: "active"
 repo: "https://github.com/ergofobe/puzzle-game"
+repo_private: true
 demo: "https://hueristic.games"
 tags: [typescript, cloudflare, game]
 ---

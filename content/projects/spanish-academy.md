@@ -4,6 +4,7 @@ date: 2026-06-20
 summary: "A bilingual marketing site for a Panama City Spanish school — courses, online booking, lead capture, and an AI chat assistant."
 status: "active"
 repo: "https://github.com/spanishacademylive/spanishacademylive-web"
+repo_private: true
 demo: "https://spanishacademylive.com"
 tags: [hugo, i18n, marketing]
 ---
