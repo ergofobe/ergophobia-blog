@@ -12,8 +12,8 @@
   </div>
 
   <div class="home-col">
-    <div class="sec-label">projects <a href="/projects/">all projects →</a></div>
-    {{ range first 3 (where .Site.RegularPages "Section" "projects").ByDate.Reverse }}{{ partial "project-row.html" . }}{{ end }}
+    <div class="sec-label">recent updates <a href="/updates/">all updates →</a></div>
+    {{ range first 5 (where .Site.RegularPages "Section" "updates").ByDate.Reverse }}{{ partial "update-row.html" . }}{{ end }}
   </div>
 </div>
 {{ end }}

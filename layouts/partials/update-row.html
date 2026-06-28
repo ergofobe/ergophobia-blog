@@ -1,0 +1,6 @@
+{{ $proj := .Site.GetPage (printf "/projects/%s" .Params.project) }}
+<div class="row">
+  <span class="date">{{ .Date.Format "2006-01-02" }}</span>
+  <div><p><a href="{{ .RelPermalink }}">{{ with .Description }}{{ . }}{{ else }}{{ .Summary | plainify | truncate 160 }}{{ end }}</a></p></div>
+  {{ with $proj }}<a class="pill" href="{{ .RelPermalink }}">{{ .Title }}</a>{{ else }}<span class="pill">{{ $.Params.project }}</span>{{ end }}
+</div>
