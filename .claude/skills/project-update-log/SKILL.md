@@ -11,7 +11,7 @@ description: >
 compatibility: Requires gh (authenticated), hugo (extended), node, and a clone of the ergophobia-blog repo.
 metadata:
   author: jim
-  version: "1.0"
+  version: "1.1"
 ---
 
 # Project Update Log
@@ -23,7 +23,18 @@ work log and the `/projects/` ordering update automatically from these posts.
 ## When to run
 
 Weekly (the scheduler fires it), or on demand. Each run covers the window since
-each project's **last** update post, so skipped weeks self-heal.
+each project's **last** update post, so skipped weeks self-heal. For a
+**backfill**, set a project's `since` further back (project inception) and let
+its subagent emit *one post per week that had real work* — multiple posts, not
+one.
+
+## Architecture: one subagent per repo
+
+The orchestrator (this context) does git and filesystem work only. Each project's
+repo is scanned **and drafted inside its own subagent**, which returns finished
+post markdown. This keeps every repo's raw commit log out of the main context and
+out of every other repo's context — no cross-repo bleed, and the orchestrator
+stays small even across a many-week backfill.
 
 ## Procedure
 
@@ -31,45 +42,45 @@ Create a todo per step and work them in order.
 
 1. **Branch.** Work on a fresh branch off `main` (e.g. `project-log-<date>`). If
    the checkout is dirty with unrelated changes, only ever stage the files you
-   write in steps 6–7.
+   write in steps 4–5.
 
-2. **Select projects.** Read every `content/projects/*.md`. Include a project
-   only if its front-matter `status` is `active` or `wip` (skip `archived`). For
-   each: `slug` = filename without `.md`; `repo` = the `repo:` URL → `owner/repo`.
+2. **Select projects (orchestrator).** Read every `content/projects/*.md`.
+   Include a project only if its front-matter `status` is `active` or `wip` (skip
+   `archived`). For each build a work item: `slug` = filename without `.md`;
+   `owner/repo` from the `repo:` URL; and `since` = the date of the newest
+   existing `content/updates/*-<slug>.md` (`ls … | sort | tail -1`), or 7 days ago
+   if none (or project inception for a backfill). Skip any project whose `repo:`
+   another included project already owns — never scan the same repo twice.
 
-3. **Find each project's window.** The newest existing update post is the window
-   start:
-   ```bash
-   ls content/updates/*-<slug>.md 2>/dev/null | sort | tail -1   # read its date:
-   ```
-   Use that post's `date` as the `since` bound. If there is no prior post, use 7
-   days ago.
+3. **Dispatch one subagent per project (in parallel).** Give each subagent its
+   `owner/repo`, `since`, `slug`, the absolute path to
+   `<skill-dir>/scripts/project-changes.sh`, and
+   `references/update-post-template.md`. Instruct it to:
+   - Run `project-changes.sh <owner/repo> <since>` — this filters to **your**
+     commits (the helper defaults `author` to your `gh` login). It also reports
+     repo visibility.
+   - Decide per the template + the **skip rule** below; for a backfill, group the
+     window into ISO weeks and draft one post per week with substance.
+   - **Return only** structured post markdown — for each post: target filename
+     `content/updates/<post-date>-<slug>.md`, the front matter, and the body.
+     Return `{skip, reason}` if nothing qualifies. The subagent does **not** write
+     files, touch git, or bump cards.
 
-4. **Fetch changes.** Run the helper:
-   ```bash
-   scripts/project-changes.sh <owner/repo> <since-YYYY-MM-DD>
-   ```
-   It prints repo visibility, commit first-lines in the window, and recent tags.
+   **Skip rule (the subagent applies it):** no post for a week with zero of your
+   commits, or only noise — pure `chore`/`ci`/version-bump churn with no
+   `feat`/`fix`/`docs`/`refactor` of substance. Never pad. For a **PRIVATE** repo
+   (per the helper's visibility line), stay high-level: themes and outcomes only,
+   no file names, internal identifiers, or unreleased specifics.
 
-5. **Decide if there's anything to log.** SKIP the project (write no post) when
-   the window has zero commits, or only noise — pure `chore`/`ci`/version-bump
-   churn with no `feat`/`fix`/`docs`/`refactor` of substance. Honor the "one post
-   per project per week **that had changes**" rule; never write an empty or
-   filler post. State which projects you skipped and why.
+4. **Collect & write (orchestrator).** Write each returned post to its
+   `content/updates/<date>-<slug>.md`. Posts are ~120–220 words, summarized (never
+   verbatim commits), in the first-person builder voice of the existing posts.
 
-6. **Write the update post** for each project that changed:
-   `content/updates/<today>-<slug>.md`, following
-   `references/update-post-template.md`. Summarize the week in your own words —
-   **never paste commit messages verbatim** — group by theme, name version tags
-   if any, and write in the first-person builder voice of the existing posts in
-   `content/updates/`. Keep it ~120–220 words. For a **non-public** repo, stay
-   high-level: themes and outcomes only, no file names, internal identifiers, or
-   anything that could leak unreleased detail.
+5. **Bump the cards (orchestrator).** For each project that produced a post, set
+   the `date:` in `content/projects/<slug>.md` to its **newest** new post's date,
+   so it floats to the top of the recency-sorted list.
 
-7. **Bump the card.** Set the `date:` in `content/projects/<slug>.md` to the new
-   post's date so the project floats to the top of the recency-sorted list.
-
-8. **Validate (gate).** All three must pass before shipping; fix and re-run until
+6. **Validate (gate).** All three must pass before shipping; fix and re-run until
    green:
    ```bash
    npm run check     # content validator
@@ -77,7 +88,7 @@ Create a todo per step and work them in order.
    hugo --gc         # clean build, exit 0
    ```
 
-9. **Ship (auto-merge).** Commit only the files from steps 6–7:
+7. **Ship (auto-merge).** Commit only the files from steps 4–5:
    ```bash
    git add content/updates content/projects
    git commit -m "content(updates): weekly project log <date>"
@@ -105,6 +116,15 @@ Create a todo per step and work them in order.
   another worktree** — harmless in a clean cron checkout; if it errors after the
   remote merge, just delete the remote branch with `git push origin --delete`.
 - **Skip silent weeks.** No substantive commits → no post. Don't pad.
+- **Only your work.** The helper filters commits to your `gh` login by default,
+  so other contributors and bots (dependabot, etc.) don't leak into your work
+  log. Pass a third arg to `project-changes.sh` to override the author, or `*`
+  for all authors.
+- **One repo, one subagent — never two cards on one repo.** If two project cards
+  share a `repo:`, only one can own its history; scan it once. Don't double-count.
+- **Backfill = many posts per repo.** A backfilling subagent returns one post per
+  ISO week with substance, not a single catch-all. Write them all; bump the card
+  to the newest.
 
 ## The scheduler
 
