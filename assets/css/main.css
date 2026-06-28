@@ -47,7 +47,7 @@ img{max-width:100%;height:auto}
 .iconbtn:hover{color:var(--ink)}
 
 /* ===== Hero ===== */
-.hero{padding:52px 0 26px}
+.hero{padding-top:52px;padding-bottom:26px}
 .hero .promptline{font-family:var(--font-mono);color:var(--muted);font-size:14px}
 .hero .promptline .g{color:var(--accent)}
 .hero h1{font-family:var(--font-mono);font-weight:700;font-size:clamp(26px,4.6vw,34px);line-height:1.16;
@@ -90,7 +90,7 @@ img{max-width:100%;height:auto}
 @media(max-width:600px){.row{grid-template-columns:1fr;gap:6px}.row .date{order:-1}}
 
 /* ===== Article ===== */
-.article{padding:34px 0 10px}
+.article{padding-top:34px;padding-bottom:10px}
 .article .kicker{font-family:var(--font-mono);font-size:12px;text-transform:uppercase;
   letter-spacing:.14em;color:var(--accent-2)}
 .article h1{font-family:var(--font-mono);font-weight:700;font-size:clamp(26px,4.4vw,34px);
