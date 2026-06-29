@@ -1,6 +1,6 @@
 ---
 title: "ergophobia"
-date: 2026-06-27
+date: 2026-06-29
 summary: "This blog — a bespoke Hugo terminal theme deployed on Cloudflare Workers."
 status: "active"
 repo: "https://github.com/ergofobe/ergophobia-blog"
