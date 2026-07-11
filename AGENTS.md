@@ -1,5 +1,32 @@
 # AGENTS.md — AI Agent Guide for Ergophobia Blog
 
+## Sync with origin — before and after every task
+
+BEFORE doing anything else in a session — before reading issues, branching, or editing a single file — make the local checkout match origin. Skip only if the human EXPLICITLY says to work offline or against a stale state.
+
+```bash
+git fetch origin
+git status --porcelain        # MUST be empty before switching branches
+```
+
+- If `git status --porcelain` prints anything, STOP. The tree is dirty — do NOT `git checkout`. A checkout from a dirty branch can silently carry uncommitted edits onto `main`. Tell the human; let them commit, stash, or discard first.
+- Only with a clean tree, update the default branch:
+
+```bash
+git checkout main && git pull --ff-only origin main
+```
+
+- If `git pull --ff-only` fails, local `main` has DIVERGED from `origin/main`. STOP and tell the human. Never force-push, hard-reset, or rebase to force it.
+- Resuming mid-task on a feature branch? `git fetch` is still mandatory, but stay on that branch — don't switch to `main`. Only rebase/merge onto it when asked. The non-negotiable part is that `main` is current before cutting a NEW branch.
+
+AFTER a PR merges, or after tearing down a git worktree, bring local `main` back in line with `origin/main` — from the primary checkout, AFTER leaving the worktree (`main` can't be checked out in two worktrees at once), clean tree only:
+
+```bash
+git checkout main && git pull --ff-only origin main
+```
+
+This applies to every agent and session unless explicitly told otherwise.
+
 ## Stack
 
 - **SSG:** Hugo Extended (bespoke dark-first terminal theme)
@@ -80,6 +107,7 @@ npm test         # unit tests (node --test)
 
 ## Rules for Agents
 
+0. Sync local `main` with `origin` before starting and after merging — see "Sync with origin — before and after every task" above.
 1. Never edit files in `public/` — auto-generated.
 2. Edit templates only for site-wide changes, not per-post tweaks.
 3. Run `npm run check` and `npm test` after any structural change; `npm run build` before committing.
