@@ -1,6 +1,6 @@
 ---
 title: "hueristic"
-date: 2026-06-29
+date: 2026-07-13
 summary: "A daily code-breaking puzzle on Cloudflare Workers — guess the hidden color code, get peg-style feedback, build a streak."
 status: "active"
 repo: "https://github.com/ergofobe/puzzle-game"
