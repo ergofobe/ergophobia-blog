@@ -1,6 +1,6 @@
 ---
 title: "spanish-academy"
-date: 2026-08-02
+date: 2026-08-23
 summary: "A bilingual marketing site for a Panama City Spanish school — courses, online booking, lead capture, and an AI chat assistant."
 status: "active"
 repo: "https://github.com/spanishacademylive/spanishacademylive-web"
