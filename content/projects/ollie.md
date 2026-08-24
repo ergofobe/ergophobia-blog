@@ -1,6 +1,6 @@
 ---
 title: "ollie"
-date: 2026-08-02
+date: 2026-08-16
 summary: "Self-hosted, AI-enabled freight TMS in Rust — loads, trips, drivers, and an MCP server built for agents."
 status: "active"
 repo: "https://github.com/olliefms/ollie"

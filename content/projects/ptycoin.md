@@ -1,6 +1,6 @@
 ---
 title: "ptycoin"
-date: 2026-08-02
+date: 2026-08-23
 summary: "Bilingual (EN/ES) crypto news and project-spotlight blog, LatAm-rooted and globally relevant, built on Hugo and Cloudflare."
 status: "active"
 repo: "https://github.com/ptycoin/ptycoin-blog"
