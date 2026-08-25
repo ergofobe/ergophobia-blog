@@ -96,8 +96,14 @@ Create a todo per step and work them in order.
    gh pr create --base main --title "content: weekly project log <date>" --body "..."
    gh pr merge --auto --squash --delete-branch
    ```
-   Merging to `main` auto-deploys via Cloudflare Workers Builds. If no project
-   changed, write nothing, open no PR, and report "no updates this week."
+   Merging to `main` does **not** publish. Once the PR has merged, deploy
+   explicitly — from a clean checkout on `main`:
+   ```bash
+   git checkout main && git pull --ff-only origin main
+   scripts/deploy.sh          # = ssh huginn /usr/local/sbin/ergophobia-deploy
+   ```
+   If no project changed, write nothing, open no PR, and report "no updates this
+   week."
 
 ## Gotchas
 
