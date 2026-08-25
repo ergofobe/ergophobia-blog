@@ -2,6 +2,8 @@
 title: "Self-sovereignty is a dial"
 date: 2026-08-25T00:00:00
 description: "I took my mail off Google. The rest of the internet still gets a vote."
+cover: "/img/covers/self-sovereignty-is-a-dial.jpg"
+coverAlt: "A rotary selector switch on a dark steel panel, set between its stops, one green lamp lit."
 tags: [self-hosting, privacy]
 ---
 
@@ -12,37 +14,35 @@ the public origin on it too.
 I don't like my bits sitting on someone else's disk under someone else's
 terms. Google's are not subtle. You don't own what you store there, and
 they are not liable for what happens to it. You depend on them to keep
-it safe and to obey the law. I think we've moved past the days of that
-being a good bet.
+it safe and to obey the law. I think we've moved past trusting them.
 
 So I rented a VPS. A Hetzner Cloud CX23 in Falkenstein, Debian 12,
 roughly €4–5 a month. Mail off Gmail, site off Cloudflare Workers, same
 box, same week.
 
-That's the easy paragraph. The rest is why "just self-host it" is not a
-switch you flip.
+The rest is why "just self-host it" is not a switch you flip.
 
 ## Other people's rules
 
 I wanted one hosting company. Not Google, not a pile of mail vendors,
-not a different account for every piece of the puzzle. Cloudflare could
-stay for DNS — it's free, I already manage it from the CLI, and I
-already use their tunnels to reach private apps in my home lab.
-Everything public would live on one always-on node.
+not a different account for every piece. Cloudflare could stay for DNS.
+It's free, I already manage it from the CLI, and I already use their
+tunnels to reach private apps in my home lab. Everything public would
+live on one always-on node.
 
 The first host I looked at advertised paying in crypto and skipping KYC.
-No card on file. That sounded like the right kind of independent, until
-it didn't. They resell the big American clouds, and those clouds block
-outbound mail, because the last renter used the box to send spam. I
-would have rented a server that could not send mail. Dead end.
+No card on file. That sounded right, until it didn't. They resell the
+big American clouds, and those clouds block outbound mail, because the
+last renter used the box to send spam. I would have rented a server
+that could not send mail. Dead end.
 
 Hetzner will actually give you a real machine with root. They will also
 block outbound ports 25 and 465 on a new account, for the same reason:
-too many new customers are a problem. So the extra mail vendor I didn't
-want — SMTP2GO, free tier, a temporary crutch — is how mail leaves the
-VPS at all. Once the account has some age and a paid invoice on it, I
-can ask them to unblock direct SMTP and drop the relay. Until then,
-leaving Google meant handing outbound to someone else.
+too many new customers are a problem. So mail leaves the VPS through
+SMTP2GO's free tier. A temporary crutch, not a design choice. Once the
+account has some age and a paid invoice on it, I can ask them to
+unblock direct SMTP and drop the relay. Until then, leaving Google
+meant handing outbound to someone else.
 
 I asked which country was better for privacy. Finland, in theory. The
 cheap box in stock was Germany. Jurisdiction is another thing you don't
@@ -53,13 +53,10 @@ Even after Hetzner opens port 25, I'll still have to play by rules I
 don't write. OpenDKIM signs what goes out. SPF and DMARC live in DNS.
 Those records are how the rest of the internet decides whether to
 believe me. Skip them and I'm a spammer. Publish them and I'm in a
-reputation system I don't control. Mail is a conversation. You don't
-get to have it alone.
+reputation system I don't control.
 
-The protocol is open. The network is not a commons you walk into. It is
-a set of people who will refuse to talk to you until you don't look
-like a problem, because most of the problems they've had were someone
-else's box. I don't blame them. I also don't pretend the VPS makes me
+The protocol is open. Getting other people's servers to listen is the
+actual work. I don't blame them. I also don't pretend the VPS makes me
 independent of them.
 
 ## A spool, not a mailbox
@@ -81,7 +78,7 @@ machine that stays up. My home lab is not that machine. It isn't
 fancy, we get power outages, and a tunnel back to the basement is a
 fragile way to hang a domain. Private apps can live with that. MX
 records and a website cannot. Caddy serves the static files Hugo
-builds. The contact form used to be a Worker; now it's a small service
+builds. The contact form used to be a Worker. Now it's a small service
 on the same host, talking to local sendmail. The running copy is mine.
 The mail it sends does not go back to Google.
 
@@ -89,22 +86,21 @@ The mail it sends does not go back to Google.
 
 DNS is still at Cloudflare. When you look up the name, they tell you
 the VPS address, and that's the end of their job. The web and mail
-records are not proxied through their network — grey-cloud, in their
-terms — because a proxy in front of mail breaks it, and a proxy in
-front of the site would hide the box I just stood up. I kept them
-because I already used them. I don't want them sitting between a
-visitor and the page.
+records are not proxied through their network. Grey-cloud, in their
+terms. A proxy in front of mail breaks it, and a proxy in front of the
+site would hide the box I just stood up. I kept them because I already
+used them. I don't want them sitting between a visitor and the page.
 
 Private apps still live in the home lab. I reach them through a
-Cloudflare tunnel: a small program on the home box that opens an
+Cloudflare tunnel. That's a small program on the home box that opens an
 outbound connection, so I don't have to punch holes in the home
-firewall. That's someone else's path to my own house. Fine for things
-that aren't public. I can't live with the house being the MX record.
+firewall. Someone else's path to my own house. Fine for things that
+aren't public. I can't live with the house being the MX record.
 
 The Hetzner account itself is still on Gmail. It has to be. If the
 login for the box is the mailbox the box is supposed to receive, the
 first outage is a lockout. So de-Googling the domain still leaves a
-Google account paying the bill. That's the shape of the problem.
+Google account paying the bill.
 
 GitHub is still where the source lives. The VPS pulls. I wanted to own
 the running origin, not pretend I host git.
@@ -124,16 +120,15 @@ Caddy and the contact service all discard theirs. The site keeps no
 visitor logs at all. The firewall is at the edge, not a program on the
 box hoping to catch someone after they're in.
 
-That's a privacy choice, and it's the thing I'm happiest about. Running
-my own box is what makes it possible to keep nothing, which is the
-opposite of a Gmail account and the opposite of every hosted platform
-that would like to know you were here.
+A privacy choice, and the thing I'm happiest about. Running my own box
+is what makes it possible to keep nothing, which is the opposite of
+Gmail, and of every hosted platform that would like to know you were
+here.
 
-Sovereignty of the individual is a principle. Applied to a mailbox and
-a website, it does not mean I run the internet from the basement. It
-means I decide who holds the mail, who sees the logs, and which clicks
-I'm willing to leave unturned because the rest of the network still
-gets a vote.
+Sovereignty of the individual is a principle. On a mailbox and a
+website that just means I decide who holds the mail and who sees the
+logs. The rest of the network still gets a vote, and some clicks stay
+unturned.
 
 The dial moved a few clicks. I can live with the ones I didn't turn.
 
