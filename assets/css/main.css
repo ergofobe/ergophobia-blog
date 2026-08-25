@@ -35,16 +35,53 @@ img{max-width:100%;height:auto}
 
 /* ===== Header ===== */
 .site-header{border-bottom:1px solid var(--line)}
-.site-header .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.site-header .wrap{display:flex;align-items:center;justify-content:space-between;gap:6px;height:64px}
 .brand{font-family:var(--font-mono);font-weight:700;font-size:18px;letter-spacing:-.02em;color:var(--ink)}
 .brand .c{color:var(--muted)} .brand .p{color:var(--accent)}
-.nav{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:13px}
+.nav{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:13px;margin-left:auto}
 .nav a{color:var(--muted);padding:6px 10px;border:1px solid transparent;border-radius:6px}
 .nav a:hover{color:var(--ink);border-color:var(--line);text-decoration:none}
 .nav a[aria-current="page"]{color:var(--accent);border-color:var(--line);background:var(--panel)}
-.iconbtn{font-family:var(--font-mono);font-size:13px;background:var(--panel);color:var(--muted);
+.iconbtn{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:13px;
+  background:var(--panel);color:var(--muted);
   border:1px solid var(--line);border-radius:6px;padding:6px 10px;cursor:pointer}
 .iconbtn:hover{color:var(--ink)}
+
+/* ===== Menu button (narrow screens only) ===== */
+.navbtn{display:none;align-items:center;justify-content:center;width:38px;height:38px;
+  background:var(--panel);color:var(--muted);border:1px solid var(--line);border-radius:6px;cursor:pointer}
+.navbtn:hover{color:var(--ink)}
+.navbtn .bars,.navbtn .bars::before,.navbtn .bars::after{
+  display:block;width:16px;height:2px;background:currentColor;border-radius:1px;transition:transform .18s ease,top .18s ease,background-color .18s ease}
+.navbtn .bars{position:relative}
+.navbtn .bars::before{content:"";position:absolute;top:-5px}
+.navbtn .bars::after{content:"";position:absolute;top:5px}
+.site-header[data-nav-open="true"] .navbtn{color:var(--ink);border-color:var(--accent)}
+.site-header[data-nav-open="true"] .navbtn .bars{background:transparent}
+.site-header[data-nav-open="true"] .navbtn .bars::before{top:0;transform:rotate(45deg)}
+.site-header[data-nav-open="true"] .navbtn .bars::after{top:0;transform:rotate(-45deg)}
+@media(prefers-reduced-motion:reduce){.navbtn .bars,.navbtn .bars::before,.navbtn .bars::after{transition:none}}
+
+/* Narrow screens: nav collapses behind the menu button */
+@media(max-width:680px){
+  .site-header{position:relative}
+  .navbtn{display:inline-flex}
+  /* Theme toggle becomes an icon button matching the menu button */
+  .site-header .wrap{gap:8px}
+  .site-header .iconbtn{width:38px;height:38px;margin-left:auto;padding:0;justify-content:center;
+    font-size:15px;line-height:1}
+  .site-header .iconbtn .lbl{display:none}
+  .js .site-header .nav{display:none;position:absolute;top:100%;left:0;right:0;z-index:50;
+    flex-direction:column;align-items:stretch;gap:2px;margin-left:0;padding:8px 24px 14px;
+    background:var(--panel);border-bottom:1px solid var(--line);box-shadow:0 12px 24px rgba(0,0,0,.28)}
+  .js .site-header[data-nav-open="true"] .nav{display:flex}
+  .js .site-header .nav a{padding:11px 10px}
+  /* No JS: the button can't work, so keep every link reachable */
+  html:not(.js) .navbtn{display:none}
+  html:not(.js) .site-header .wrap{flex-wrap:wrap;height:auto;padding-top:12px;padding-bottom:12px;row-gap:10px}
+  html:not(.js) .site-header .nav{order:3;flex-basis:100%;flex-wrap:wrap;justify-content:center;margin-left:0}
+  html:not(.js) .site-header .nav a{flex:1 1 28%;padding:9px 8px;text-align:center}
+}
 
 /* ===== Hero ===== */
 .hero{padding-top:52px;padding-bottom:26px}
