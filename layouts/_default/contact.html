@@ -1,0 +1,38 @@
+{{ define "main" }}
+<section class="wrap hero">
+  <div class="promptline"><span class="g">jim@ergophobia</span>:~$ mail</div>
+  <h1>say <span class="hl">hello</span><span class="cursor"></span></h1>
+  <p>Public inbox for ergophobia.org. No newsletter, no CRM — a message goes to Jim.</p>
+</section>
+<div class="wrap reading" data-pagefind-ignore>
+  <p class="hero" id="contact-notice" hidden style="padding-top:0"></p>
+  <form class="contact-form" method="post" action="/contact">
+    <label for="name">Name</label>
+    <input id="name" name="name" maxlength="120" autocomplete="name" required>
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" maxlength="200" autocomplete="email" required>
+    <label for="subject">Subject</label>
+    <input id="subject" name="subject" maxlength="200" required>
+    <label for="body">Message</label>
+    <textarea id="body" name="body" maxlength="8000" required></textarea>
+    <input class="hp" name="company" tabindex="-1" autocomplete="off">
+    <button type="submit">send</button>
+  </form>
+</div>
+<script>
+(function () {
+  var msgs = {
+    sent: "sent. jim will see it.",
+    rate: "rate limited — try later",
+    missing: "missing fields",
+    fail: "mailer failed — try again"
+  };
+  var status = new URLSearchParams(location.search).get("status");
+  var el = document.getElementById("contact-notice");
+  if (!el || !status || !msgs[status]) return;
+  el.hidden = false;
+  el.innerHTML = '<span class="promptline"><span class="g"></span></span>';
+  el.querySelector(".g").textContent = msgs[status];
+})();
+</script>
+{{ end }}

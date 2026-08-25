@@ -31,7 +31,7 @@ This applies to every agent and session unless explicitly told otherwise.
 
 - **SSG:** Hugo Extended (bespoke dark-first terminal theme)
 - **Search:** Pagefind (bundled by `npm run build`)
-- **Deploy:** Cloudflare Workers Builds — serves `./public`; pushes to `main` deploy automatically; PRs get a preview URL
+- **Deploy:** huginn (Hetzner). Origin is GitHub. Push `main`, then `ssh huginn /usr/local/sbin/ergophobia-deploy` (or `scripts/deploy.sh`). The VPS pulls, builds Hugo+Pagefind into `/var/www/ergophobia`, restarts the Bun contact POST handler. Do not rsync `public/` from a laptop. Cloudflare Workers Builds may still run for CI/previews; live origin is huginn.
 - **Language:** English only
 
 ## Directory Structure
@@ -47,8 +47,11 @@ layouts/
 content/
   posts/               # blog posts (YYYY-MM-DD-slug.md)
   projects/            # project pages (slug.md)
+  contact.md           # contact form (Hugo GET; POST → contact/)
 assets/css/main.css    # ALL design tokens — :root dark, [data-theme="light"] light
 static/fonts/          # self-hosted web fonts
+contact/               # Bun POST handler for /contact (sendmail)
+scripts/huginn-deploy.sh  # build + install on huginn (run via /usr/local/sbin/ergophobia-deploy)
 public/                # build output (do not edit directly)
 ```
 
