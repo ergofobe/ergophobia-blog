@@ -28,3 +28,7 @@ git checkout main && git pull --ff-only origin main
 ```
 
 This applies to every agent and session unless explicitly told otherwise.
+
+## Deploy
+
+Live site is huginn. After the change is on `origin/main`, run `scripts/deploy.sh` (or `ssh huginn /usr/local/sbin/ergophobia-deploy`). Do not rsync `public/` and do not treat a GitHub push as a deploy. Full procedure: AGENTS.md → Deploy.

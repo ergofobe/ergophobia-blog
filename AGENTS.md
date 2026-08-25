@@ -31,7 +31,7 @@ This applies to every agent and session unless explicitly told otherwise.
 
 - **SSG:** Hugo Extended (bespoke dark-first terminal theme)
 - **Search:** Pagefind (bundled by `npm run build`)
-- **Deploy:** huginn (Hetzner). Origin is GitHub. Push `main`, then `ssh huginn /usr/local/sbin/ergophobia-deploy` (or `scripts/deploy.sh`). The VPS pulls, builds Hugo+Pagefind into `/var/www/ergophobia`, restarts the Bun contact POST handler. Do not rsync `public/` from a laptop. Cloudflare Workers Builds may still run for CI/previews; live origin is huginn.
+- **Deploy:** huginn. See **Deploy** below. Cloudflare Workers Builds may still run for CI/previews; they are not the live origin.
 - **Language:** English only
 
 ## Directory Structure
@@ -103,6 +103,33 @@ npm run check    # validate post/project front matter
 npm test         # unit tests (node --test)
 ```
 
+## Deploy
+
+Live site is **huginn** (Hetzner), not Cloudflare. Origin is this GitHub repo (`ergofobe/ergophobia-blog`). huginn clones it at `/opt/ergophobia-blog` and **pulls**.
+
+After a site or contact-app change is on `origin/main`:
+
+```bash
+git push origin main
+scripts/deploy.sh
+# same as: ssh huginn /usr/local/sbin/ergophobia-deploy
+```
+
+That wrapper on huginn does `git fetch` + `git reset --hard origin/main`, then `scripts/huginn-deploy.sh`: `npm ci`, Hugo (production `baseURL` from `hugo.toml`), Pagefind, rsync `public/` → `/var/www/ergophobia`, restart `ergophobia-contact`.
+
+Verify:
+
+```bash
+curl -sS -o /dev/null -w '%{http_code}\n' https://ergophobia.org/
+curl -sS -o /dev/null -w '%{http_code}\n' https://ergophobia.org/contact/
+```
+
+GET `/contact/` is Hugo (`content/contact.md` + `layouts/_default/contact.html`). POST `/contact` is Bun (`contact/server.ts`) via Caddy; it 303s to `/contact/?status=sent|rate|missing|fail`.
+
+Do **not** rsync `public/` from a laptop. Do **not** `git push` to huginn. Do **not** edit files under `/var/www/ergophobia` or `/opt/ergophobia-blog` by hand.
+
+Caddy, systemd, and mail are **not** in this repo. Caddyfile lives on huginn at `/etc/caddy/Caddyfile` (laptop copy: `~/.config/ergophobia/Caddyfile`). Contact unit: `ergophobia-contact.service`, `WorkingDirectory=/opt/ergophobia-blog/contact`. Changing those is huginn ops, not a blog deploy.
+
 ## Theme
 
 - Dark is the default; the header toggle cycles dark → light → system.
@@ -114,5 +141,6 @@ npm test         # unit tests (node --test)
 1. Never edit files in `public/` — auto-generated.
 2. Edit templates only for site-wide changes, not per-post tweaks.
 3. Run `npm run check` and `npm test` after any structural change; `npm run build` before committing.
-4. Follow existing template patterns in `layouts/`.
-5. Images go in `static/` and are referenced as `/img/filename.ext`.
+4. After pushing site or `contact/` changes to `origin/main`, deploy to huginn (`scripts/deploy.sh`). GitHub is not the live host.
+5. Follow existing template patterns in `layouts/`.
+6. Images go in `static/` and are referenced as `/img/filename.ext`.
