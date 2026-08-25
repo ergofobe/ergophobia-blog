@@ -1,0 +1,20 @@
+{{- /* Resolves a post's cover image. Returns an empty dict unless the page is a
+       post with a `cover` set, so updates and projects keep the default OG card.
+       Images under assets/ are processed into a 1200x630 share card; anything
+       else (static/, remote) is passed through untouched. */ -}}
+{{- $out := dict -}}
+{{- if and .IsPage (eq .Section "posts") -}}
+  {{- with .Params.cover -}}
+    {{- $alt := $.Params.coverAlt | default "" -}}
+    {{- $img := resources.Get (strings.TrimPrefix "/" .) -}}
+    {{- if and $img (eq $img.ResourceType "image") (ne $img.MediaType.SubType "svg") -}}
+      {{- $og := $img.Fill "1200x630 Smart jpg q85" -}}
+      {{- $hero := $img -}}
+      {{- if gt $img.Width 1200 -}}{{- $hero = $img.Resize "1200x" -}}{{- end -}}
+      {{- $out = dict "src" $hero.RelPermalink "width" $hero.Width "height" $hero.Height "og" $og.Permalink "ogWidth" $og.Width "ogHeight" $og.Height "alt" $alt -}}
+    {{- else -}}
+      {{- $out = dict "src" . "og" (absURL .) "alt" $alt -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- return $out -}}

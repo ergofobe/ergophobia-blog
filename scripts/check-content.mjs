@@ -1,5 +1,5 @@
-import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join, extname } from "node:path";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { join, extname, dirname, resolve } from "node:path";
 
 function walk(dir) {
   const out = [];
@@ -29,8 +29,20 @@ function frontMatter(text) {
 
 const STATUSES = new Set(["active", "wip", "archived"]);
 const isURL = s => typeof s === "string" && /^https?:\/\/\S+$/.test(s);
+const COVER_ROOTS = ["assets", "static"];
+const IMAGE_EXT = new Set([".png", ".jpg", ".jpeg", ".webp", ".avif", ".gif"]);
 
-export function validate(root) {
+function coverErrors(rel, cover, siteRoot) {
+  if (typeof cover !== "string") return [`${rel}: cover must be a path string`];
+  if (!cover.startsWith("/")) return [`${rel}: cover must be a site-absolute path (e.g. /img/covers/slug.png)`];
+  if (!IMAGE_EXT.has(extname(cover).toLowerCase())) return [`${rel}: cover must be an image (${[...IMAGE_EXT].join(", ")})`];
+  const roots = COVER_ROOTS.filter(d => existsSync(join(siteRoot, d)));
+  if (!roots.length) return [];
+  if (roots.some(d => existsSync(join(siteRoot, d, cover.slice(1))))) return [];
+  return [`${rel}: cover file not found under ${roots.map(d => d + cover).join(" or ")}`];
+}
+
+export function validate(root, siteRoot = dirname(resolve(root))) {
   const errors = [];
   for (const file of walk(root)) {
     if (/(^|\/)_index\.md$/.test(file) || /\/search\.md$/.test(file) || /\/about\.md$/.test(file) || /\/contact\.md$/.test(file)) continue;
@@ -46,6 +58,10 @@ export function validate(root) {
       if (!fm.title) errors.push(`${rel}: missing title`);
       if (!fm.date) errors.push(`${rel}: missing date`);
       if (!fm.description) errors.push(`${rel}: missing description`);
+    }
+    if (fm.cover) {
+      if (rel.startsWith("posts/")) errors.push(...coverErrors(rel, fm.cover, siteRoot));
+      else errors.push(`${rel}: cover is only supported on posts/`);
     }
   }
   return { errors };

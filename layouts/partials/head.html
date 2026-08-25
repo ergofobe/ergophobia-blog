@@ -10,10 +10,18 @@
 <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
 <link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
 {{ template "_internal/opengraph.html" . }}
-{{ $og := "/img/og-default.png" }}
-{{ with .Params.cover }}{{ $og = . }}{{ end }}
-<meta property="og:image" content="{{ $og | absURL }}">
-<meta name="twitter:image" content="{{ $og | absURL }}">
+{{ $cover := partial "cover.html" . }}
+{{ $og := $cover.og | default ("/img/og-default.png" | absURL) }}
+<meta property="og:image" content="{{ $og }}">
+<meta name="twitter:image" content="{{ $og }}">
 <meta name="twitter:card" content="summary_large_image">
+{{- with $cover.ogWidth }}
+<meta property="og:image:width" content="{{ . }}">
+<meta property="og:image:height" content="{{ $cover.ogHeight }}">
+{{- end }}
+{{- with $cover.alt }}
+<meta property="og:image:alt" content="{{ . }}">
+<meta name="twitter:image:alt" content="{{ . }}">
+{{- end }}
 {{ with .OutputFormats.Get "rss" }}<link rel="alternate" type="application/rss+xml" href="{{ .Permalink }}" title="{{ $.Site.Title }}">{{ end }}
 {{ partial "analytics.html" . }}
