@@ -57,6 +57,9 @@ public/                # build output (do not edit directly)
 
 ## Content Authoring
 
+Write in Jim's voice. See [VOICE.md](VOICE.md) before drafting a post,
+update, or any first-person copy.
+
 ### Posts — `content/posts/YYYY-MM-DD-slug.md`
 
 ```yaml
@@ -163,3 +166,4 @@ Caddy, systemd, and mail are **not** in this repo. Caddyfile lives on huginn at 
 4. After pushing site or `contact/` changes to `origin/main`, deploy to huginn (`scripts/deploy.sh`). GitHub is not the live host.
 5. Follow existing template patterns in `layouts/`.
 6. Images go in `static/` and are referenced as `/img/filename.ext`. Post cover images are the exception — they go in `assets/img/covers/` so Hugo can generate the share card (see "Cover Images").
+7. First-person copy follows [VOICE.md](VOICE.md).

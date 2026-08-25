@@ -1,6 +1,6 @@
 # CLAUDE.md — Claude Code Guide for Ergophobia Blog
 
-See [AGENTS.md](AGENTS.md) for the full stack, directory structure, authoring conventions, and build commands. This file adds the rules Claude Code must follow every session.
+See [AGENTS.md](AGENTS.md) for the full stack, directory structure, authoring conventions, and build commands. See [VOICE.md](VOICE.md) before drafting a post, update, or any first-person copy. This file adds the rules Claude Code must follow every session.
 
 ## Sync with origin — before and after every task
 
