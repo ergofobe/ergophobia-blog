@@ -1,19 +1,38 @@
 const PORT = Number(process.env.PORT || 3000);
 const TO = process.env.MAIL_TO || "jim@ergophobia.org";
 const FROM = process.env.MAIL_FROM || "contact@ergophobia.org";
+const WINDOW_MS = 60 * 60 * 1000;
+const SWEEP_MS = 60 * 1000;
+const MAX_IPS = 50_000;
 const hits = new Map<string, number[]>();
+let lastSweep = 0;
+
+function sweep(now: number): void {
+  if (now - lastSweep < SWEEP_MS) return;
+  lastSweep = now;
+  for (const [key, times] of hits) {
+    if (times.length === 0 || now - times[times.length - 1] >= WINDOW_MS) hits.delete(key);
+  }
+}
+
+function evictOverflow(): void {
+  for (const key of hits.keys()) {
+    if (hits.size <= MAX_IPS) return;
+    hits.delete(key);
+  }
+}
 
 function allowed(ip: string): boolean {
-  const now = Date.now();
-  const windowMs = 60 * 60 * 1000;
-  const prev = (hits.get(ip) || []).filter((t) => now - t < windowMs);
-  if (prev.length >= 8) {
-    hits.set(ip, prev);
-    return false;
-  }
-  prev.push(now);
+  const now = performance.now();
+  sweep(now);
+  const prev = (hits.get(ip) || []).filter((t) => now - t < WINDOW_MS);
+  const limited = prev.length >= 8;
+  if (!limited) prev.push(now);
+  // Re-insert so Map order stays least-recently-seen first, making overflow eviction an LRU.
+  hits.delete(ip);
   hits.set(ip, prev);
-  return true;
+  evictOverflow();
+  return !limited;
 }
 
 function redirect(status: string, httpStatus = 303): Response {
@@ -23,9 +42,12 @@ function redirect(status: string, httpStatus = 303): Response {
   });
 }
 
+function oneLine(value: string): string {
+  return value.replace(/[\r\n]+/g, " ").slice(0, 200);
+}
+
 function header(name: string, value: string): string {
-  const v = value.replace(/[\r\n]+/g, " ").slice(0, 200);
-  return `${name}: ${v}`;
+  return `${name}: ${oneLine(value)}`;
 }
 
 async function sendMail(name: string, email: string, subject: string, body: string): Promise<void> {
@@ -50,8 +72,13 @@ async function sendMail(name: string, email: string, subject: string, body: stri
   if (code !== 0) throw new Error(err || `sendmail exited ${code}`);
 }
 
+setInterval(() => sweep(performance.now()), SWEEP_MS).unref();
+
 Bun.serve({
   port: PORT,
+  // Caddy proxies to 127.0.0.1:3000. Binding localhost-only keeps the XFF chain
+  // unforgeable rather than trusting the cloud firewall to hide this port.
+  hostname: "127.0.0.1",
   async fetch(req) {
     const url = new URL(req.url);
     if (url.pathname !== "/contact" && url.pathname !== "/contact/") {
@@ -59,11 +86,15 @@ Bun.serve({
     }
     if (req.method !== "POST") return new Response("method", { status: 405 });
 
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    // Caddy appends the real peer to any client-supplied header, so only the last entry is trustworthy.
+    const ip = req.headers.get("x-forwarded-for")?.split(",").pop()?.trim() || "unknown";
     if (!allowed(ip)) return redirect("rate");
 
     const form = await req.formData();
-    if (String(form.get("company") || "")) return redirect("sent");
+    if (String(form.get("company") || "")) {
+      console.error(`honeypot ip=${oneLine(ip)} email=${oneLine(String(form.get("email") || ""))}`);
+      return redirect("sent");
+    }
     const name = String(form.get("name") || "").trim();
     const email = String(form.get("email") || "").trim();
     const subject = String(form.get("subject") || "").trim();
