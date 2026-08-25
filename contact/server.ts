@@ -1,12 +1,23 @@
 const PORT = Number(process.env.PORT || 3000);
 const TO = process.env.MAIL_TO || "jim@ergophobia.org";
 const FROM = process.env.MAIL_FROM || "contact@ergophobia.org";
+const WINDOW_MS = 60 * 60 * 1000;
+const SWEEP_MS = 60 * 1000;
 const hits = new Map<string, number[]>();
+let lastSweep = 0;
+
+function sweep(now: number): void {
+  if (now - lastSweep < SWEEP_MS) return;
+  lastSweep = now;
+  for (const [key, times] of hits) {
+    if (now - times[times.length - 1] >= WINDOW_MS) hits.delete(key);
+  }
+}
 
 function allowed(ip: string): boolean {
   const now = Date.now();
-  const windowMs = 60 * 60 * 1000;
-  const prev = (hits.get(ip) || []).filter((t) => now - t < windowMs);
+  sweep(now);
+  const prev = (hits.get(ip) || []).filter((t) => now - t < WINDOW_MS);
   if (prev.length >= 8) {
     hits.set(ip, prev);
     return false;
