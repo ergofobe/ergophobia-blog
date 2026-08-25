@@ -46,12 +46,35 @@ img{max-width:100%;height:auto}
   border:1px solid var(--line);border-radius:6px;padding:6px 10px;cursor:pointer}
 .iconbtn:hover{color:var(--ink)}
 
-/* Narrow screens: brand + theme toggle on one row, nav wraps below */
+/* ===== Menu button (narrow screens only) ===== */
+.navbtn{display:none;align-items:center;justify-content:center;width:38px;height:38px;
+  background:var(--panel);color:var(--muted);border:1px solid var(--line);border-radius:6px;cursor:pointer}
+.navbtn:hover{color:var(--ink)}
+.navbtn .bars,.navbtn .bars::before,.navbtn .bars::after{
+  display:block;width:16px;height:2px;background:currentColor;border-radius:1px;transition:transform .18s ease,top .18s ease,background-color .18s ease}
+.navbtn .bars{position:relative}
+.navbtn .bars::before{content:"";position:absolute;top:-5px}
+.navbtn .bars::after{content:"";position:absolute;top:5px}
+.site-header[data-nav-open="true"] .navbtn{color:var(--ink);border-color:var(--accent)}
+.site-header[data-nav-open="true"] .navbtn .bars{background:transparent}
+.site-header[data-nav-open="true"] .navbtn .bars::before{top:0;transform:rotate(45deg)}
+.site-header[data-nav-open="true"] .navbtn .bars::after{top:0;transform:rotate(-45deg)}
+@media(prefers-reduced-motion:reduce){.navbtn .bars,.navbtn .bars::before,.navbtn .bars::after{transition:none}}
+
+/* Narrow screens: nav collapses behind the menu button */
 @media(max-width:680px){
-  .site-header .wrap{flex-wrap:wrap;height:auto;padding-top:12px;padding-bottom:12px;row-gap:10px}
-  .site-header .nav{order:3;flex-basis:100%;flex-wrap:wrap;justify-content:center;margin-left:0}
-  .site-header .nav a{flex:1 1 28%;padding:9px 8px;text-align:center}
-  .site-header .iconbtn{padding:9px 10px}
+  .site-header{position:relative}
+  .navbtn{display:inline-flex}
+  .js .site-header .nav{display:none;position:absolute;top:100%;left:0;right:0;z-index:50;
+    flex-direction:column;align-items:stretch;gap:2px;margin-left:0;padding:8px 24px 14px;
+    background:var(--panel);border-bottom:1px solid var(--line);box-shadow:0 12px 24px rgba(0,0,0,.28)}
+  .js .site-header[data-nav-open="true"] .nav{display:flex}
+  .js .site-header .nav a{padding:11px 10px}
+  /* No JS: the button can't work, so keep every link reachable */
+  html:not(.js) .navbtn{display:none}
+  html:not(.js) .site-header .wrap{flex-wrap:wrap;height:auto;padding-top:12px;padding-bottom:12px;row-gap:10px}
+  html:not(.js) .site-header .nav{order:3;flex-basis:100%;flex-wrap:wrap;justify-content:center;margin-left:0}
+  html:not(.js) .site-header .nav a{flex:1 1 28%;padding:9px 8px;text-align:center}
 }
 
 /* ===== Hero ===== */
