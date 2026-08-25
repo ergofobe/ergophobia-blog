@@ -35,16 +35,24 @@ img{max-width:100%;height:auto}
 
 /* ===== Header ===== */
 .site-header{border-bottom:1px solid var(--line)}
-.site-header .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.site-header .wrap{display:flex;align-items:center;justify-content:space-between;gap:6px;height:64px}
 .brand{font-family:var(--font-mono);font-weight:700;font-size:18px;letter-spacing:-.02em;color:var(--ink)}
 .brand .c{color:var(--muted)} .brand .p{color:var(--accent)}
-.nav{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:13px}
+.nav{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:13px;margin-left:auto}
 .nav a{color:var(--muted);padding:6px 10px;border:1px solid transparent;border-radius:6px}
 .nav a:hover{color:var(--ink);border-color:var(--line);text-decoration:none}
 .nav a[aria-current="page"]{color:var(--accent);border-color:var(--line);background:var(--panel)}
 .iconbtn{font-family:var(--font-mono);font-size:13px;background:var(--panel);color:var(--muted);
   border:1px solid var(--line);border-radius:6px;padding:6px 10px;cursor:pointer}
 .iconbtn:hover{color:var(--ink)}
+
+/* Narrow screens: brand + theme toggle on one row, nav wraps below */
+@media(max-width:680px){
+  .site-header .wrap{flex-wrap:wrap;height:auto;padding-top:12px;padding-bottom:12px;row-gap:10px}
+  .site-header .nav{order:3;flex-basis:100%;flex-wrap:wrap;justify-content:center;margin-left:0}
+  .site-header .nav a{flex:1 1 28%;padding:9px 8px;text-align:center}
+  .site-header .iconbtn{padding:9px 10px}
+}
 
 /* ===== Hero ===== */
 .hero{padding-top:52px;padding-bottom:26px}

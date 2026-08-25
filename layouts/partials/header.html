@@ -6,6 +6,6 @@
     <a href="/about/" {{ if eq .RelPermalink "/about/" }}aria-current="page"{{ end }}>about</a>
     <a href="/contact/" {{ if hasPrefix .RelPermalink "/contact" }}aria-current="page"{{ end }}>contact</a>
     {{ if .Site.Params.search.enabled }}<a href="/search/">./search</a>{{ end }}
-    {{ partial "theme-toggle.html" . }}
   </nav>
+  {{ partial "theme-toggle.html" . }}
 </div></header>
