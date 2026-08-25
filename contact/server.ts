@@ -3,6 +3,7 @@ const TO = process.env.MAIL_TO || "jim@ergophobia.org";
 const FROM = process.env.MAIL_FROM || "contact@ergophobia.org";
 const WINDOW_MS = 60 * 60 * 1000;
 const SWEEP_MS = 60 * 1000;
+const MAX_IPS = 50_000;
 const hits = new Map<string, number[]>();
 let lastSweep = 0;
 
@@ -10,7 +11,14 @@ function sweep(now: number): void {
   if (now - lastSweep < SWEEP_MS) return;
   lastSweep = now;
   for (const [key, times] of hits) {
-    if (now - times[times.length - 1] >= WINDOW_MS) hits.delete(key);
+    if (times.length === 0 || now - times[times.length - 1] >= WINDOW_MS) hits.delete(key);
+  }
+}
+
+function evictOverflow(): void {
+  for (const key of hits.keys()) {
+    if (hits.size <= MAX_IPS) return;
+    hits.delete(key);
   }
 }
 
@@ -18,13 +26,13 @@ function allowed(ip: string): boolean {
   const now = performance.now();
   sweep(now);
   const prev = (hits.get(ip) || []).filter((t) => now - t < WINDOW_MS);
-  if (prev.length >= 8) {
-    hits.set(ip, prev);
-    return false;
-  }
-  prev.push(now);
+  const limited = prev.length >= 8;
+  if (!limited) prev.push(now);
+  // Re-insert so Map order stays least-recently-seen first, making overflow eviction an LRU.
+  hits.delete(ip);
   hits.set(ip, prev);
-  return true;
+  evictOverflow();
+  return !limited;
 }
 
 function redirect(status: string, httpStatus = 303): Response {
@@ -75,7 +83,8 @@ Bun.serve({
     }
     if (req.method !== "POST") return new Response("method", { status: 405 });
 
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    // Caddy appends the real peer to any client-supplied header, so only the last entry is trustworthy.
+    const ip = req.headers.get("x-forwarded-for")?.split(",").pop()?.trim() || "unknown";
     if (!allowed(ip)) return redirect("rate");
 
     const form = await req.formData();
