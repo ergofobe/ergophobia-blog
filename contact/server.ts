@@ -76,6 +76,9 @@ setInterval(() => sweep(performance.now()), SWEEP_MS).unref();
 
 Bun.serve({
   port: PORT,
+  // Caddy proxies to 127.0.0.1:3000. Binding localhost-only keeps the XFF chain
+  // unforgeable rather than trusting the cloud firewall to hide this port.
+  hostname: "127.0.0.1",
   async fetch(req) {
     const url = new URL(req.url);
     if (url.pathname !== "/contact" && url.pathname !== "/contact/") {
