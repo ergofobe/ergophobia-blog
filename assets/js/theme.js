@@ -1,6 +1,6 @@
 (function () {
   var order = ["dark", "light", "system"];
-  var labels = { dark: "☾ dark", light: "☀ light", system: "⌘ system" };
+  var icons = { dark: "☾", light: "☀", system: "⌘" };
   function effective(p) {
     if (p === "system") return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
     return p;
@@ -9,7 +9,11 @@
     document.documentElement.setAttribute("data-theme", effective(p));
     document.documentElement.setAttribute("data-theme-pref", p);
     var b = document.getElementById("theme-toggle");
-    if (b) { b.textContent = labels[p]; b.setAttribute("aria-label", "Theme: " + p); }
+    if (!b) return;
+    var ico = b.querySelector(".ico"), lbl = b.querySelector(".lbl");
+    if (ico) ico.textContent = icons[p];
+    if (lbl) lbl.textContent = p;
+    b.setAttribute("aria-label", "Theme: " + p);
   }
   function current() { return localStorage.getItem("theme") || "dark"; }
   window.addEventListener("DOMContentLoaded", function () {
