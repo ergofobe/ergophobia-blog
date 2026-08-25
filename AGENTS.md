@@ -82,7 +82,9 @@ fall back to `/img/og-default.png` on socials, and `npm run check` errors if the
   with width/height/alt tags) and serves a ≤1200px-wide hero above the post body.
 - A path under `static/` also works but is passed through unprocessed — the raw file
   becomes the share card at whatever aspect ratio it happens to be.
-- Landscape sources crop best; aim for 1.91:1 or wider-than-tall.
+- Landscape sources crop best; aim for 1.91:1 or wider-than-tall. Supply at
+  least 1200×630 — nothing rejects a smaller file, it just gets upscaled into a
+  blurry share card and a stretched hero.
 - `coverAlt` falls back to the post title, so the hero is never announced as
   decorative — but write a real one when the image carries meaning.
 - Posts without a `cover` are unchanged: `/img/og-default.png`, no hero.

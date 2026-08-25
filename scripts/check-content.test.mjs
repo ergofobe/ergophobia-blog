@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { validate } from "./check-content.mjs";
+import { validate, frontMatter } from "./check-content.mjs";
 
 function scaffold(files) {
   const root = mkdtempSync(join(tmpdir(), "cc-"));
@@ -68,6 +68,27 @@ test("front matter with YAML inline comments parses as documented in AGENTS.md",
   const { errors } = validate(join(root, "content"), root);
   assert.deepEqual(errors, []);
   rmSync(root, { recursive: true, force: true });
+});
+
+test("single-quoted cover is accepted", () => {
+  const root = scaffold({
+    "content/posts/a.md": "---\ntitle: A\ndate: 2026-01-01\ndescription: hi\ncover: '/img/covers/a.png'  # optional\n---\nb",
+    "assets/img/covers/a.png": "x",
+  });
+  const { errors } = validate(join(root, "content"), root);
+  assert.deepEqual(errors, []);
+  rmSync(root, { recursive: true, force: true });
+});
+
+test("escaped quotes inside a double-quoted value do not truncate it", () => {
+  const fm = frontMatter('---\ntitle: "The \\"real\\" cost"  # nickname\ndate: 2026-01-01\n---\nb');
+  assert.equal(fm.title, 'The "real" cost');
+});
+
+test("quoted values keep an embedded # and shed the trailing comment", () => {
+  const fm = frontMatter('---\ndescription: "Tagged #hashtag"  # note\ntags: [meta, "x #1"]  # topics\n---\nb');
+  assert.equal(fm.description, "Tagged #hashtag");
+  assert.deepEqual(fm.tags, ["meta", "x #1"]);
 });
 
 test("a # inside a quoted value is not treated as a comment", () => {
