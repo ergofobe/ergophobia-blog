@@ -61,6 +61,8 @@ async function sendMail(name: string, email: string, subject: string, body: stri
   if (code !== 0) throw new Error(err || `sendmail exited ${code}`);
 }
 
+setInterval(() => sweep(Date.now()), SWEEP_MS).unref();
+
 Bun.serve({
   port: PORT,
   async fetch(req) {
