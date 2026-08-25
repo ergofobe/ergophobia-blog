@@ -65,7 +65,7 @@ title: "Post Title"
 date: 2026-01-09T21:50:00
 description: "One-line meta description."
 cover: "/img/covers/my-post.png"   # optional — social share image + page hero
-coverAlt: "What the image shows."  # optional — alt text for the cover
+coverAlt: "What the image shows."  # optional — alt text; defaults to the title
 tags: [tag1, tag2]
 ---
 ```
@@ -83,6 +83,8 @@ fall back to `/img/og-default.png` on socials, and `npm run check` errors if the
 - A path under `static/` also works but is passed through unprocessed — the raw file
   becomes the share card at whatever aspect ratio it happens to be.
 - Landscape sources crop best; aim for 1.91:1 or wider-than-tall.
+- `coverAlt` falls back to the post title, so the hero is never announced as
+  decorative — but write a real one when the image carries meaning.
 - Posts without a `cover` are unchanged: `/img/og-default.png`, no hero.
 
 ### Projects — `content/projects/slug.md`

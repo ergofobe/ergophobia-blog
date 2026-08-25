@@ -11,6 +11,14 @@ function walk(dir) {
   return out;
 }
 
+// Drops a trailing ` # comment`, leaving quoted strings and flow sequences intact.
+function stripComment(v) {
+  const close = v.startsWith('"') ? v.indexOf('"', 1) : v.startsWith("[") ? v.indexOf("]") : -1;
+  if (close !== -1) return v.slice(0, close + 1);
+  const hash = v.search(/\s#/);
+  return hash === -1 ? v : v.slice(0, hash).trim();
+}
+
 function frontMatter(text) {
   const m = text.match(/^---\n([\s\S]*?)\n---/);
   if (!m) return null;
@@ -19,7 +27,7 @@ function frontMatter(text) {
     const i = line.indexOf(":");
     if (i === -1) continue;
     const k = line.slice(0, i).trim();
-    let v = line.slice(i + 1).trim();
+    let v = stripComment(line.slice(i + 1).trim());
     if (v.startsWith("[") && v.endsWith("]")) v = v.slice(1, -1).split(",").map(s => s.trim()).filter(Boolean);
     else if (v.startsWith('"') && v.endsWith('"')) v = v.slice(1, -1);
     fm[k] = v;
@@ -36,10 +44,8 @@ function coverErrors(rel, cover, siteRoot) {
   if (typeof cover !== "string") return [`${rel}: cover must be a path string`];
   if (!cover.startsWith("/")) return [`${rel}: cover must be a site-absolute path (e.g. /img/covers/slug.png)`];
   if (!IMAGE_EXT.has(extname(cover).toLowerCase())) return [`${rel}: cover must be an image (${[...IMAGE_EXT].join(", ")})`];
-  const roots = COVER_ROOTS.filter(d => existsSync(join(siteRoot, d)));
-  if (!roots.length) return [];
-  if (roots.some(d => existsSync(join(siteRoot, d, cover.slice(1))))) return [];
-  return [`${rel}: cover file not found under ${roots.map(d => d + cover).join(" or ")}`];
+  if (COVER_ROOTS.some(d => existsSync(join(siteRoot, d, cover.slice(1))))) return [];
+  return [`${rel}: cover file not found under ${COVER_ROOTS.map(d => d + cover).join(" or ")}`];
 }
 
 export function validate(root, siteRoot = dirname(resolve(root))) {
