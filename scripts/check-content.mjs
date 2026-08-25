@@ -32,6 +32,10 @@ function stripComment(v) {
   return hash === -1 ? v : v.slice(0, hash).trim();
 }
 
+// Deliberately a subset of YAML: enough to read the scalars this checker
+// asserts on. \" and \\ are unescaped, but \n, \t and \uXXXX are left literal,
+// and a flow sequence containing a quoted "," or "]" will not split correctly.
+// Hugo does the real parsing at build time.
 function unquote(v) {
   if (v.length < 2) return v;
   if (v.startsWith('"') && v.endsWith('"')) return v.slice(1, -1).replace(/\\(["\\])/g, "$1");
