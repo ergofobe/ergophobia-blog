@@ -64,11 +64,28 @@ public/                # build output (do not edit directly)
 title: "Post Title"
 date: 2026-01-09T21:50:00
 description: "One-line meta description."
+cover: "/img/covers/my-post.png"   # optional — social share image + page hero
+coverAlt: "What the image shows."  # optional — alt text; defaults to the title
 tags: [tag1, tag2]
 ---
 ```
 
 Create: `hugo new posts/my-post.md`
+
+### Cover Images — posts only
+
+`cover` is a **post-only** field. Projects and `content/updates/` must not set it; they
+fall back to `/img/og-default.png` on socials, and `npm run check` errors if they do.
+
+- Put the file in `assets/img/covers/` and reference it as `/img/covers/slug.png`.
+  From `assets/`, Hugo crops a 1200×630 JPEG share card (`og:image`, `twitter:image`,
+  with width/height/alt tags) and serves a ≤1200px-wide hero above the post body.
+- A path under `static/` also works but is passed through unprocessed — the raw file
+  becomes the share card at whatever aspect ratio it happens to be.
+- Landscape sources crop best; aim for 1.91:1 or wider-than-tall.
+- `coverAlt` falls back to the post title, so the hero is never announced as
+  decorative — but write a real one when the image carries meaning.
+- Posts without a `cover` are unchanged: `/img/og-default.png`, no hero.
 
 ### Projects — `content/projects/slug.md`
 
@@ -143,4 +160,4 @@ Caddy, systemd, and mail are **not** in this repo. Caddyfile lives on huginn at 
 3. Run `npm run check` and `npm test` after any structural change; `npm run build` before committing.
 4. After pushing site or `contact/` changes to `origin/main`, deploy to huginn (`scripts/deploy.sh`). GitHub is not the live host.
 5. Follow existing template patterns in `layouts/`.
-6. Images go in `static/` and are referenced as `/img/filename.ext`.
+6. Images go in `static/` and are referenced as `/img/filename.ext`. Post cover images are the exception — they go in `assets/img/covers/` so Hugo can generate the share card (see "Cover Images").

@@ -96,6 +96,8 @@ img{max-width:100%;height:auto}
 .article h1{font-family:var(--font-mono);font-weight:700;font-size:clamp(26px,4.4vw,34px);
   line-height:1.18;letter-spacing:-.02em;margin:10px 0 8px}
 .article .byline{font-family:var(--font-mono);color:var(--muted);font-size:13px;margin-bottom:26px}
+.article .cover{margin:0 0 30px}
+.article .cover img{display:block;width:100%;border:1px solid var(--line);border-radius:var(--radius)}
 .prose{font-size:17px}
 .prose h2{font-family:var(--font-mono);font-size:22px;margin:34px 0 10px;letter-spacing:-.01em}
 .prose h3{font-family:var(--font-mono);font-size:18px;margin:26px 0 8px}
