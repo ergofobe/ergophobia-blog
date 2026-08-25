@@ -11,15 +11,35 @@ function walk(dir) {
   return out;
 }
 
-// Drops a trailing ` # comment`, leaving quoted strings and flow sequences intact.
+// Drops a trailing ` # comment`, leaving quoted strings and flow sequences
+// intact. Understands both YAML quote styles and their escape forms.
 function stripComment(v) {
-  const close = v.startsWith('"') ? v.indexOf('"', 1) : v.startsWith("[") ? v.indexOf("]") : -1;
-  if (close !== -1) return v.slice(0, close + 1);
+  const q = v[0];
+  if (q === '"' || q === "'") {
+    for (let i = 1; i < v.length; i++) {
+      if (q === '"' && v[i] === "\\") { i++; continue; }
+      if (v[i] !== q) continue;
+      if (q === "'" && v[i + 1] === "'") { i++; continue; }
+      return v.slice(0, i + 1);
+    }
+    return v;
+  }
+  if (q === "[") {
+    const end = v.indexOf("]");
+    return end === -1 ? v : v.slice(0, end + 1);
+  }
   const hash = v.search(/\s#/);
   return hash === -1 ? v : v.slice(0, hash).trim();
 }
 
-function frontMatter(text) {
+function unquote(v) {
+  if (v.length < 2) return v;
+  if (v.startsWith('"') && v.endsWith('"')) return v.slice(1, -1).replace(/\\(["\\])/g, "$1");
+  if (v.startsWith("'") && v.endsWith("'")) return v.slice(1, -1).replace(/''/g, "'");
+  return v;
+}
+
+export function frontMatter(text) {
   const m = text.match(/^---\n([\s\S]*?)\n---/);
   if (!m) return null;
   const fm = {};
@@ -28,8 +48,8 @@ function frontMatter(text) {
     if (i === -1) continue;
     const k = line.slice(0, i).trim();
     let v = stripComment(line.slice(i + 1).trim());
-    if (v.startsWith("[") && v.endsWith("]")) v = v.slice(1, -1).split(",").map(s => s.trim()).filter(Boolean);
-    else if (v.startsWith('"') && v.endsWith('"')) v = v.slice(1, -1);
+    if (v.startsWith("[") && v.endsWith("]")) v = v.slice(1, -1).split(",").map(s => unquote(s.trim())).filter(Boolean);
+    else v = unquote(v);
     fm[k] = v;
   }
   return fm;

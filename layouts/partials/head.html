@@ -13,14 +13,17 @@
 {{ $cover := partial "cover.html" . }}
 {{ $og := $cover.og | default ("/img/og-default.png" | absURL) }}
 <meta property="og:image" content="{{ $og }}">
-<meta name="twitter:image" content="{{ $og }}">
-<meta name="twitter:card" content="summary_large_image">
+{{- /* og:image:* are structured properties of the og:image above — keep them adjacent. */}}
 {{- with $cover.ogWidth }}
 <meta property="og:image:width" content="{{ . }}">
 <meta property="og:image:height" content="{{ $cover.ogHeight }}">
 {{- end }}
 {{- with $cover.alt }}
 <meta property="og:image:alt" content="{{ . }}">
+{{- end }}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ $og }}">
+{{- with $cover.alt }}
 <meta name="twitter:image:alt" content="{{ . }}">
 {{- end }}
 {{ with .OutputFormats.Get "rss" }}<link rel="alternate" type="application/rss+xml" href="{{ .Permalink }}" title="{{ $.Site.Title }}">{{ end }}
