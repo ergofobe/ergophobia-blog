@@ -15,7 +15,7 @@ function sweep(now: number): void {
 }
 
 function allowed(ip: string): boolean {
-  const now = Date.now();
+  const now = performance.now();
   sweep(now);
   const prev = (hits.get(ip) || []).filter((t) => now - t < WINDOW_MS);
   if (prev.length >= 8) {
@@ -34,9 +34,12 @@ function redirect(status: string, httpStatus = 303): Response {
   });
 }
 
+function oneLine(value: string): string {
+  return value.replace(/[\r\n]+/g, " ").slice(0, 200);
+}
+
 function header(name: string, value: string): string {
-  const v = value.replace(/[\r\n]+/g, " ").slice(0, 200);
-  return `${name}: ${v}`;
+  return `${name}: ${oneLine(value)}`;
 }
 
 async function sendMail(name: string, email: string, subject: string, body: string): Promise<void> {
@@ -61,7 +64,7 @@ async function sendMail(name: string, email: string, subject: string, body: stri
   if (code !== 0) throw new Error(err || `sendmail exited ${code}`);
 }
 
-setInterval(() => sweep(Date.now()), SWEEP_MS).unref();
+setInterval(() => sweep(performance.now()), SWEEP_MS).unref();
 
 Bun.serve({
   port: PORT,
@@ -76,7 +79,10 @@ Bun.serve({
     if (!allowed(ip)) return redirect("rate");
 
     const form = await req.formData();
-    if (String(form.get("company") || "")) return redirect("sent");
+    if (String(form.get("company") || "")) {
+      console.error(`honeypot ip=${oneLine(ip)} email=${oneLine(String(form.get("email") || ""))}`);
+      return redirect("sent");
+    }
     const name = String(form.get("name") || "").trim();
     const email = String(form.get("email") || "").trim();
     const subject = String(form.get("subject") || "").trim();
