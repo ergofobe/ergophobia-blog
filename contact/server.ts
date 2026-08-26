@@ -1,6 +1,15 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { buildEncryptedMail, MAX_ATTACHMENTS, MAX_TOTAL_BYTES, type Attachment } from "./mail.ts";
+
 const PORT = Number(process.env.PORT || 3000);
 const TO = process.env.MAIL_TO || "jim@ergophobia.org";
 const FROM = process.env.MAIL_FROM || "contact@ergophobia.org";
+const PUBKEY_PATH = process.env.PGP_PUBKEY_FILE || join(import.meta.dir, "..", "static", "jim.asc");
+const PUBKEY = readFileSync(PUBKEY_PATH, "utf8");
+if (!PUBKEY.includes("BEGIN PGP PUBLIC KEY BLOCK")) {
+  throw new Error(`invalid OpenPGP public key at ${PUBKEY_PATH}`);
+}
 const WINDOW_MS = 60 * 60 * 1000;
 const SWEEP_MS = 60 * 1000;
 const MAX_IPS = 50_000;
@@ -46,24 +55,27 @@ function oneLine(value: string): string {
   return value.replace(/[\r\n]+/g, " ").slice(0, 200);
 }
 
-function header(name: string, value: string): string {
-  return `${name}: ${oneLine(value)}`;
+async function attachmentsFromForm(form: FormData): Promise<Attachment[] | "too_big"> {
+  const out: Attachment[] = [];
+  let total = 0;
+  for (const item of form.getAll("attachments")) {
+    if (typeof item === "string") continue;
+    const file = item as File;
+    if (!file.name && file.size === 0) continue;
+    if (out.length >= MAX_ATTACHMENTS) return "too_big";
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    total += bytes.byteLength;
+    if (total > MAX_TOTAL_BYTES) return "too_big";
+    out.push({
+      filename: file.name || "attachment",
+      contentType: file.type || "application/octet-stream",
+      bytes,
+    });
+  }
+  return out;
 }
 
-async function sendMail(name: string, email: string, subject: string, body: string): Promise<void> {
-  const mime = [
-    header("From", `${name} via contact <${FROM}>`),
-    header("To", TO),
-    header("Reply-To", email),
-    header("Subject", `[ergophobia.org] ${subject}`),
-    "MIME-Version: 1.0",
-    "Content-Type: text/plain; charset=UTF-8",
-    "",
-    `From: ${name} <${email}>`,
-    "",
-    body,
-    "",
-  ].join("\r\n");
+async function sendMail(mime: string): Promise<void> {
   const proc = Bun.spawn(["sendmail", "-t", "-oi"], { stdin: "pipe", stderr: "pipe" });
   proc.stdin.write(mime);
   proc.stdin.end();
@@ -102,8 +114,14 @@ Bun.serve({
     if (!name || !email || !subject || !body || !email.includes("@")) {
       return redirect("missing");
     }
+    const attachments = await attachmentsFromForm(form);
+    if (attachments === "too_big") return redirect("too_big");
     try {
-      await sendMail(name, email, subject, body);
+      const mime = await buildEncryptedMail(
+        { name, email, subject, body, attachments },
+        { to: TO, from: FROM, publicKeyArmored: PUBKEY },
+      );
+      await sendMail(mime);
     } catch (e) {
       console.error(e);
       return redirect("fail");

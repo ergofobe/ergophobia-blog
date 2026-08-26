@@ -2,11 +2,11 @@
 <section class="wrap hero">
   <div class="promptline"><span class="g">jim@ergophobia</span>:~$ mail</div>
   <h1>say <span class="hl">hello</span><span class="cursor"></span></h1>
-  <p>Public inbox for ergophobia.org. No newsletter, no CRM — a message goes to Jim.</p>
+  <p>Public inbox for ergophobia.org. No newsletter, no CRM — a message goes to Jim. Body and files are encrypted to his PGP key before they sit on the mail server. You don't need GPG.</p>
 </section>
 <div class="wrap reading" data-pagefind-ignore>
   <p class="hero" id="contact-notice" hidden style="padding-top:0"></p>
-  <form class="contact-form" method="post" action="/contact">
+  <form class="contact-form" method="post" action="/contact" enctype="multipart/form-data">
     <label for="name">Name</label>
     <input id="name" name="name" maxlength="120" autocomplete="name" required>
     <label for="email">Email</label>
@@ -15,9 +15,19 @@
     <input id="subject" name="subject" maxlength="200" required>
     <label for="body">Message</label>
     <textarea id="body" name="body" maxlength="8000" required></textarea>
+    <label for="attachments">Attachments</label>
+    <input id="attachments" name="attachments" type="file" multiple>
+    <span class="hint">optional. several files, 8 MB total.</span>
     <input class="hp" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
     <button type="submit">send</button>
   </form>
+  <section class="pgp-key" id="pgp">
+    <h2>PGP public key</h2>
+    <p>Anyone who wants to encrypt to Jim directly can use this key. Submitting the form already does that for you.</p>
+    <p class="fingerprint">Fingerprint {{ .Site.Params.pgp.fingerprint }}</p>
+    <pre class="pgp-pubkey">{{ readFile "static/jim.asc" | safeHTML }}</pre>
+    <p><a href="/jim.asc" download="jim-ergophobia.asc">download jim.asc</a></p>
+  </section>
 </div>
 <script>
 (function () {
@@ -25,6 +35,7 @@
     sent: "sent. jim will see it.",
     rate: "rate limited — try later",
     missing: "missing fields",
+    too_big: "attachments too large — 8 MB total",
     fail: "mailer failed — try again"
   };
   var status = new URLSearchParams(location.search).get("status");

@@ -50,7 +50,7 @@ content/
   contact.md           # contact form (Hugo GET; POST → contact/)
 assets/css/main.css    # ALL design tokens — :root dark, [data-theme="light"] light
 static/fonts/          # self-hosted web fonts
-contact/               # Bun POST handler for /contact (sendmail)
+contact/               # Bun POST handler for /contact (PGP-encrypt + sendmail)
 scripts/huginn-deploy.sh  # build + install on huginn (run via /usr/local/sbin/ergophobia-deploy)
 public/                # build output (do not edit directly)
 ```
@@ -137,7 +137,7 @@ scripts/deploy.sh
 # same as: ssh huginn /usr/local/sbin/ergophobia-deploy
 ```
 
-That wrapper on huginn does `git fetch` + `git reset --hard origin/main`, then `scripts/huginn-deploy.sh`: `npm ci`, Hugo (production `baseURL` from `hugo.toml`), Pagefind, rsync `public/` → `/var/www/ergophobia`, restart `ergophobia-contact`.
+That wrapper on huginn does `git fetch` + `git reset --hard origin/main`, then `scripts/huginn-deploy.sh`: `npm ci`, `bun install` in `contact/`, Hugo (production `baseURL` from `hugo.toml`), Pagefind, rsync `public/` → `/var/www/ergophobia`, restart `ergophobia-contact`.
 
 Verify:
 
@@ -146,7 +146,7 @@ curl -sS -o /dev/null -w '%{http_code}\n' https://ergophobia.org/
 curl -sS -o /dev/null -w '%{http_code}\n' https://ergophobia.org/contact/
 ```
 
-GET `/contact/` is Hugo (`content/contact.md` + `layouts/_default/contact.html`). POST `/contact` is Bun (`contact/server.ts`) via Caddy; it 303s to `/contact/?status=sent|rate|missing|fail`.
+GET `/contact/` is Hugo (`content/contact.md` + `layouts/_default/contact.html`). It publishes Jim's PGP public key (`static/jim.asc`, also at `/jim.asc`). POST `/contact` is Bun (`contact/server.ts`) via Caddy; it encrypts the body and attachments to that key (PGP/MIME), sendmail, then 303s to `/contact/?status=sent|rate|missing|too_big|fail`.
 
 Do **not** rsync `public/` from a laptop. Do **not** `git push` to huginn. Do **not** edit files under `/var/www/ergophobia` or `/opt/ergophobia-blog` by hand.
 

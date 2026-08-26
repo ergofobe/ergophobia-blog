@@ -6,7 +6,7 @@
     "dev": "hugo server -D --navigateToChanged",
     "build": "sh scripts/cf-build.sh",
     "check": "node scripts/check-content.mjs content",
-    "test": "node --test"
+    "test": "node --test scripts/check-content.test.mjs && bun test contact"
   },
   "devDependencies": {
     "pagefind": "^1.1.0"

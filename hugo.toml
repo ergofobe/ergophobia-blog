@@ -28,3 +28,5 @@ timeZone = "America/New_York"
     enabled = true
   [params.analytics]
     cloudflare_token = ""   # set to the Cloudflare Web Analytics token to enable the beacon
+  [params.pgp]
+    fingerprint = "A5ED D8D6 3668 10E2 CD4F C251 BC33 D07F 2146 E41D"

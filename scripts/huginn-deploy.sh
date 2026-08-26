@@ -5,6 +5,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 npm ci
+(cd "$ROOT/contact" && bun install --frozen-lockfile)
 hugo --gc --minify
 ./node_modules/.bin/pagefind --site public
 
