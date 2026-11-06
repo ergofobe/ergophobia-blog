@@ -15,9 +15,13 @@
 {{ $og := $cover.og | default ("/img/og-default.png" | absURL) }}
 <meta property="og:image" content="{{ $og }}">
 {{- /* og:image:* are structured properties of the og:image above — keep them adjacent. */}}
-{{- with $cover.ogWidth }}
-<meta property="og:image:width" content="{{ . }}">
+{{- if $cover.ogWidth }}
+<meta property="og:image:width" content="{{ $cover.ogWidth }}">
 <meta property="og:image:height" content="{{ $cover.ogHeight }}">
+{{- else if not $cover.og }}
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="~/ergophobia — A quiet corner of the internet">
 {{- end }}
 {{- with $cover.alt }}
 <meta property="og:image:alt" content="{{ . }}">
