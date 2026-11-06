@@ -1,0 +1,14 @@
+{{ define "main" }}
+<article class="wrap reading article">
+  <h1>{{ .Title }}</h1>
+  <div class="prose">
+  {{ range hugo.Data.wishlist.items }}
+    <h2>{{ if .url }}<a href="{{ .url }}" rel="noopener noreferrer">{{ .name }}</a>{{ else }}{{ .name }}{{ end }}</h2>
+    {{ with .why }}<p>{{ . }}</p>{{ end }}
+    <p>{{ with .price }}<strong>{{ . }}</strong>{{ end }}{{ with .price_date }} as of {{ . }}{{ end }}{{ with .seller }} · {{ . }}{{ end }}</p>
+    {{ with .url }}<p><a href="{{ . }}" rel="noopener noreferrer">View product →</a></p>{{ end }}
+    {{ with .alt_note }}<p><em>{{ . }}</em></p>{{ end }}
+  {{ end }}
+  </div>
+</article>
+{{ end }}
