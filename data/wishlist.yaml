@@ -2,9 +2,9 @@
 # Fields: name (required), why, price, price_date, seller, url, alt_note
 items:
   - name: "Crucial Pro 64GB (2 x 32GB) DDR4-3200 CL22 desktop kit (CP2K32G4DFRA32A)"
-    why: "RAM upgrade for thor, my home server (Ryzen 5 3600 / ASUS B450-F). Takes it from 16GB to 64GB as a matched 2x32GB kit replacing the current memory."
+    why: "RAM upgrade for my home lab server: a matched 2x32GB kit to go from 16GB to 64GB."
     price: "$629.99"
     price_date: "Nov 6, 2026"
-    seller: "Micro Center (in stock at the Duluth, GA store; in-store pickup only)"
+    seller: "Micro Center"
     url: "https://www.microcenter.com/product/666570/crucial-pro-64gb-(2-x-32gb)-ddr4-3200-pc4-25600-cl22-dual-channel-desktop-memory-kit-cp2k32g4dfra32a-black"
     alt_note: "Also fine: Corsair Vengeance LPX 64GB (2x32GB) DDR4-3200 CL16, CMK64GX4M2E3200C16 — currently out of stock."
