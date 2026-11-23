@@ -75,7 +75,7 @@ function coverErrors(rel, cover, siteRoot) {
 export function validate(root, siteRoot = dirname(resolve(root))) {
   const errors = [];
   for (const file of walk(root)) {
-    if (/(^|\/)_index\.md$/.test(file) || /\/search\.md$/.test(file) || /\/about\.md$/.test(file) || /\/contact\.md$/.test(file)) continue;
+    if (/(^|\/)_index\.md$/.test(file) || /\/search\.md$/.test(file) || /\/about\.md$/.test(file) || /\/contact\.md$/.test(file) || /\/wishlist\.md$/.test(file)) continue;
     const fm = frontMatter(readFileSync(file, "utf8"));
     const rel = file.slice(root.length + 1);
     if (!fm) { errors.push(`${rel}: missing front matter`); continue; }
