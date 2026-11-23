@@ -1,6 +1,6 @@
 ---
 title: "ergophobia"
-date: 2026-08-30
+date: 2026-11-23
 summary: "This blog — a bespoke Hugo terminal theme, self-hosted on a Hetzner VPS behind Caddy."
 status: "active"
 repo: "https://github.com/ergofobe/ergophobia-blog"
